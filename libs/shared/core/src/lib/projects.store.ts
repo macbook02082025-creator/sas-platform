@@ -8,6 +8,7 @@ export interface Project {
   id: string;
   name: string;
   description?: string;
+  load: number;
   organizationId: string;
   createdAt: string;
   updatedAt: string;
@@ -44,11 +45,11 @@ export const ProjectsStore = signalStore(
         )
       )
     ),
-    createProject: rxMethod<{ name: string }>(
+    createProject: rxMethod<{ name: string; description?: string }>(
       pipe(
         tap(() => patchState(store, { isLoading: true })),
-        switchMap((data) =>
-          http.post<Project>('/api/v1/projects', data).pipe(
+        switchMap(({ name, description }) =>
+          http.post<Project>('/api/v1/projects', { name, description }).pipe(
             tap((newProject) => 
               patchState(store, { 
                 projects: [...store.projects(), newProject], 

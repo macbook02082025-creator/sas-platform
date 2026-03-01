@@ -1,0 +1,76 @@
+<div class="chat-container">
+  <!-- CHAT HEADER -->
+  <div class="chat-header">
+    <div class="ch-left">
+      <div class="ch-icon">🧠</div>
+      <div class="ch-info">
+        <div class="ch-name">{{project()?.name || 'Intelligence Unit'}}</div>
+        <div class="ch-status">
+          <div class="pulse-dot dot-active"></div>
+          <span>Active Neural Link</span>
+        </div>
+      </div>
+    </div>
+    <div class="ch-actions">
+      <div class="tb-btn" title="Clear History">
+        <span class="material-symbols-rounded">delete_sweep</span>
+      </div>
+      <div class="tb-btn" title="Skill Settings">
+        <span class="material-symbols-rounded">tune</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MESSAGES AREA -->
+  <div class="messages-area" #scrollContainer>
+    @for (msg of messages(); track msg.timestamp) {
+      <div class="msg-wrapper" [class.user]="msg.role === 'user'">
+        <div class="msg-avatar">
+          {{msg.role === 'user' ? 'N' : '⬡'}}
+        </div>
+        <div class="msg-content">
+          <div class="msg-bubble">
+            {{msg.content}}
+            @if (msg.isStreaming) {
+              <span class="cursor-blink">|</span>
+            }
+          </div>
+          <div class="msg-time">{{msg.timestamp | date:'shortTime'}}</div>
+        </div>
+      </div>
+    }
+    
+    @if (isThinking() && !messages()[messages().length - 1]?.isStreaming) {
+      <div class="msg-wrapper">
+        <div class="msg-avatar">⬡</div>
+        <div class="msg-content">
+          <div class="thinking-loader">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- INPUT AREA -->
+  <div class="input-area">
+    <div class="input-container">
+      <textarea 
+        #inputBox
+        placeholder="Send a directive to the intelligence unit..." 
+        [(ngModel)]="userInput"
+        (keydown.enter)="$event.preventDefault(); sendMessage()"
+        [disabled]="isThinking()"
+      ></textarea>
+      <div class="input-footer">
+        <div class="input-hints">
+          <span class="kbd">↵</span> to send
+          <span class="kbd">shift + ↵</span> for new line
+        </div>
+        <button class="send-btn" (click)="sendMessage()" [disabled]="!userInput().trim() || isThinking()">
+          <span class="material-symbols-rounded">arrow_upward</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

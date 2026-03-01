@@ -36,6 +36,11 @@ export const appRoutes: Route[] = [
         path: 'knowledge',
         loadComponent: () =>
           import('./knowledge').then((m) => m.KnowledgeBaseComponent),
+      },
+      {
+        path: 'chat/:id',
+        loadComponent: () =>
+          import('./chat').then((m) => m.ChatComponent),
       }
     ]
   },

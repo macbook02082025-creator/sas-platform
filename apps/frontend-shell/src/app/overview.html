@@ -81,17 +81,20 @@
     @if (layout() === 'grid') {
       <div class="units-grid">
         @for (project of projects(); track project.id) {
-          <div class="unit-card" #card (mousemove)="trackMouse($event, card)" (mouseleave)="resetMouse(card)">
+          <div class="unit-card" #card 
+               (mousemove)="trackMouse($event, card)" 
+               (mouseleave)="resetMouse(card)"
+               [routerLink]="['/dashboard/chat', project.id]">
             <div class="uc-top">
               <div class="uc-icon" style="background:linear-gradient(135deg,#4f46e5,#7c3aed)">📁</div>
-              <div class="uc-menu">⋯</div>
+              <div class="uc-menu" (click)="$event.stopPropagation()">⋯</div>
             </div>
             <div class="uc-name">{{project.name}}</div>
             <div class="uc-desc">{{project.description}}</div>
             
             <div class="unit-progress">
-              <div class="up-label"><span>Skill Load</span><span style="color:#22c55e">87%</span></div>
-              <div class="up-track"><div class="up-fill" style="width:87%;background:linear-gradient(90deg,#22c55e,#86efac)"></div></div>
+              <div class="up-label"><span>Skill Load</span><span style="color:#22c55e">{{project.load}}%</span></div>
+              <div class="up-track"><div class="up-fill" [style.width]="project.load + '%'" style="background:linear-gradient(90deg,#22c55e,#86efac)"></div></div>
             </div>
 
             <div class="uc-tags">
@@ -132,7 +135,10 @@
       <!-- List View -->
       <div class="units-list">
         @for (project of projects(); track project.id) {
-          <div class="list-item" (mousemove)="trackMouse($event, li)" (mouseleave)="resetMouse(li)" #li>
+          <div class="list-item" 
+               (mousemove)="trackMouse($event, li)" 
+               (mouseleave)="resetMouse(li)" #li
+               [routerLink]="['/dashboard/chat', project.id]">
             <div class="li-icon">📁</div>
             <div class="li-content">
               <div class="li-header">

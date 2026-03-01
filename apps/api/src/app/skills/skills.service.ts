@@ -48,4 +48,23 @@ export class SkillsService {
     if (!skill) throw new NotFoundException('Skill not found');
     return skill;
   }
+
+  async update(tenantId: string, id: string, data: Partial<CreateSkillDto>) {
+    await this.findOne(tenantId, id);
+    const { projectId, ...rest } = data;
+    return this.prisma.skill.update({
+      where: { id },
+      data: {
+        ...rest,
+        ...(projectId ? { project: { connect: { id: projectId } } } : {})
+      }
+    });
+  }
+
+  async delete(tenantId: string, id: string) {
+    await this.findOne(tenantId, id);
+    return this.prisma.skill.delete({
+      where: { id }
+    });
+  }
 }

@@ -1,12 +1,13 @@
 import { Component, inject, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { ProjectsStore, ActivityStore, StatsStore } from '@sas-platform/shared-core';
 import { DashboardService } from './dashboard.service';
 
 @Component({
   selector: 'app-overview',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './overview.html',
   styleUrls: ['./dashboard.scss', './overview.scss'],
 })

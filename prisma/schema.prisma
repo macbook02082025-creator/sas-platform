@@ -45,6 +45,7 @@ model Project {
   id              String         @id @default(uuid())
   name            String
   description     String?        @default("Ready for skill deployment. Intelligence pipeline active.")
+  load            Int            @default(0)
   organizationId  String
   organization    Organization   @relation(fields: [organizationId], references: [id])
   skills          Skill[]

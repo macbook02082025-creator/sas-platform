@@ -9,10 +9,12 @@ export class ProjectsService {
     private activityService: ActivityService
   ) {}
 
-  async create(tenantId: string, name: string) {
+  async create(tenantId: string, name: string, description?: string) {
     const project = await this.prisma.project.create({
       data: {
         name,
+        description: description || "Ready for skill deployment. Intelligence pipeline active.",
+        load: Math.floor(Math.random() * 50) + 40, // Random load between 40 and 90
         organizationId: tenantId,
       },
     });
@@ -58,5 +60,20 @@ export class ProjectsService {
     }
 
     return project;
+  }
+
+  async update(tenantId: string, id: string, data: { name?: string; description?: string }) {
+    await this.findOne(tenantId, id);
+    return this.prisma.project.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async delete(tenantId: string, id: string) {
+    await this.findOne(tenantId, id);
+    return this.prisma.project.delete({
+      where: { id },
+    });
   }
 }

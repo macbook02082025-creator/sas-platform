@@ -81,8 +81,9 @@ export default class DashboardComponent implements AfterViewInit {
 
   createProject() {
     const name = this.dashboardService.newProjectName();
+    const description = this.dashboardService.newProjectDescription();
     if (name.trim()) {
-      this.projectsStore.createProject({ name });
+      this.projectsStore.createProject({ name, description });
       this.dashboardService.closeModal();
     }
   }
