@@ -1,57 +1,75 @@
-<div class="kb-container">
-  <header class="section-header">
-    <div class="header-left">
-      <span class="material-symbols-rounded">database</span>
-      <h1>Knowledge Base</h1>
-    </div>
-    <div class="header-actions">
-      <button class="btn-primary" (click)="fileInput.click()">
-        <span class="material-symbols-rounded">upload</span>
-        UPLOAD SOURCE
-      </button>
-      <input #fileInput type="file" style="display: none" (change)="onFileSelected($event)" multiple>
-    </div>
-  </header>
+<!-- DATA VAULT HEADER -->
+<div class="sec-header" style="margin-bottom: 24px">
+  <div class="sec-title-group">
+    <span class="sec-title">Vault Network</span>
+    <span class="sec-badge">{{documents().length}} sources</span>
+  </div>
+  <div class="sec-actions">
+    <div class="filter-btn">⚙ Sync All</div>
+    <button class="new-btn" (click)="fileInput.click()">
+      <span>+</span> Add Source
+    </button>
+    <input #fileInput type="file" style="display: none" (change)="onFileSelected($event)" multiple>
+  </div>
+</div>
 
-  <div class="kb-layout">
-    <!-- Drag & Drop Zone -->
-    <div class="upload-zone" [class.dragging]="isDragging()" (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)">
-      <div class="zone-content">
-        <div class="icon-stack">
-          <span class="material-symbols-rounded">cloud_upload</span>
+<div class="kb-grid">
+  <!-- UPLOAD ZONE -->
+  <div class="unit-card upload-zone" 
+       [class.dragging]="isDragging()" 
+       (dragover)="onDragOver($event)" 
+       (dragleave)="onDragLeave()" 
+       (drop)="onDrop($event)"
+       (click)="fileInput.click()">
+    <div class="new-plus">
+      <span class="material-symbols-rounded">cloud_upload</span>
+    </div>
+    <div class="new-lbl">Vault Ingestion</div>
+    <div class="new-sub">Drop PDF, MD, or TXT to index</div>
+    <div class="zone-hint">MAX 25MB PER SOURCE</div>
+  </div>
+
+  <!-- DOCUMENT CARDS -->
+  @for (doc of documents(); track doc.id) {
+    <div class="unit-card" #card (mousemove)="trackMouse($event, card)" (mouseleave)="resetMouse(card)">
+      <div class="uc-top">
+        <div class="uc-icon" [style.background]="doc.type === 'pdf' ? 'linear-gradient(135deg,#ef4444,#b91c1c)' : 'linear-gradient(135deg,#06b6d4,#0891b2)'">
+          <span class="material-symbols-rounded" style="font-size: 20px">description</span>
         </div>
-        <h3>Ingest Intelligence</h3>
-        <p>Drop PDF, Markdown or Text files here to augment your AI units.</p>
-        <span class="hint">Max file size: 25MB</span>
+        <div class="uc-menu">⋯</div>
+      </div>
+      <div class="uc-name">{{doc.name}}</div>
+      <div class="uc-desc">Source metadata indexed. Vector embeddings generated. Ready for RAG retrieval.</div>
+      
+      <div class="uc-tags">
+        <span class="uc-tag" style="color:#67e8f9;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.22)">{{doc.type}}</span>
+        <span class="uc-tag" style="color:#86efac;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.22)">{{doc.size}}</span>
+      </div>
+
+      <div class="uc-footer">
+        <div class="uc-status">
+          <div class="pulse-dot dot-active"></div>
+          <span style="color:#22c55e">Indexed</span>
+        </div>
+        <div class="uc-id">
+          Added: {{formatTime(doc.updatedAt)}}
+        </div>
       </div>
     </div>
+  }
+</div>
 
-    <!-- Active Documents -->
-    <div class="docs-section">
-      <div class="section-meta">
-        <h3>ACTIVE SOURCES</h3>
-        <span class="count">{{ documents().length }} FILES</span>
+<!-- ACTIVITY PREVIEW -->
+<div class="panel-box" style="margin-top: 24px">
+  <div class="panel-title">Vault Activity</div>
+  <div class="activity-feed">
+    <div class="act-item">
+      <div class="act-line">
+        <div class="act-dot" style="background:#22c55e;box-shadow:0 0 7px #22c55e;margin-top:4px"></div>
       </div>
-
-      <div class="docs-list">
-        <div class="empty-docs" *ngIf="!documents().length">
-          <span class="material-symbols-rounded">find_in_page</span>
-          <p>No documents indexed yet.</p>
-        </div>
-
-        <div class="doc-item" *ngFor="let doc of documents()">
-          <div class="doc-icon">
-            <span class="material-symbols-rounded">description</span>
-          </div>
-          <div class="doc-info">
-            <span class="doc-name">{{ doc.name }}</span>
-            <span class="doc-meta">{{ doc.size }} • {{ doc.status }}</span>
-          </div>
-          <div class="doc-actions">
-            <button class="action-btn"><span class="material-symbols-rounded">visibility</span></button>
-            <button class="action-btn delete"><span class="material-symbols-rounded">delete</span></button>
-          </div>
-        </div>
+      <div class="act-body">
+        <div class="act-text"><strong>Master Vault</strong> sync complete — 842 vectors updated</div>
+        <div class="act-time">12m ago</div>
       </div>
     </div>
   </div>

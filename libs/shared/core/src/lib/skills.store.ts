@@ -12,6 +12,7 @@ export interface Skill {
   temperature: number;
   modelName: string;
   projectId: string;
+  createdAt: string;
 }
 
 export interface SkillsState {

@@ -1,81 +1,132 @@
-<div class="editor-container">
-  <header class="editor-header">
-    <div class="header-left">
-      <span class="material-symbols-rounded">bolt</span>
-      <h1>Create AI Skill</h1>
+<!-- SKILLS LAB HEADER -->
+<div class="sec-header" style="margin-bottom: 24px">
+  <div class="sec-title-group">
+    <span class="sec-title">Skills Synthesis</span>
+    <span class="sec-badge">{{skills().length}} deployed</span>
+  </div>
+  <div class="sec-actions">
+    <div class="filter-btn">⚙ Protocols</div>
+    <button class="new-btn" (click)="openEditor()">
+      <span>+</span> Forge Skill
+    </button>
+  </div>
+</div>
+
+<div class="skills-grid">
+  <!-- FORGE CARD -->
+  <div class="unit-card forge-zone" (click)="openEditor()">
+    <div class="new-plus">
+      <span class="material-symbols-rounded">psychology</span>
     </div>
-    <div class="header-actions">
-      <button class="btn-secondary" type="button">Cancel</button>
-      <button class="btn-primary" (click)="onSubmit()" [disabled]="skillForm.invalid || skillsStore.isLoading()">
-        <span *ngIf="!skillsStore.isLoading()">Save Skill</span>
-        <span *ngIf="skillsStore.isLoading()" class="spinner"></span>
-      </button>
-    </div>
-  </header>
+    <div class="new-lbl">Forge New Skill</div>
+    <div class="new-sub">Define cognitive behaviors</div>
+  </div>
 
-  <form [formGroup]="skillForm" class="editor-layout">
-    <!-- Main Form Area -->
-    <div class="editor-main">
-      <div class="form-section">
-        <label for="name">Skill Name</label>
-        <input id="name" type="text" formControlName="name" placeholder="e.g. FAQ Assistant">
-      </div>
-
-      <div class="form-section">
-        <label for="description">Description</label>
-        <input id="description" type="text" formControlName="description" placeholder="What does this skill do?">
-      </div>
-
-      <div class="form-section prompt-section">
-        <div class="section-header">
-          <label for="systemPrompt">System Prompt</label>
-          <span class="badge">Dynamic Variables Support {{ '{{variable}}' }}</span>
+  <!-- SKILL CARDS -->
+  @for (skill of skills(); track skill.id) {
+    <div class="unit-card" #card (mousemove)="trackMouse($event, card)" (mouseleave)="resetMouse(card)">
+      <div class="uc-top">
+        <div class="uc-icon" style="background: linear-gradient(135deg, var(--p), #be185d)">
+          <span class="material-symbols-rounded" style="font-size: 20px">bolt</span>
         </div>
-        <textarea 
-          id="systemPrompt" 
-          formControlName="systemPrompt" 
-          placeholder="You are a helpful assistant that..."
-        ></textarea>
+        <div class="uc-menu">⋯</div>
+      </div>
+      <div class="uc-name">{{skill.name}}</div>
+      <div class="uc-desc">{{skill.description || 'Cognitive logic core initialized. Ready for neural processing.'}}</div>
+      
+      <div class="uc-tags">
+        <span class="uc-tag">{{skill.modelName}}</span>
+        <span class="uc-tag">T: {{skill.temperature}}</span>
+      </div>
+
+      <div class="uc-footer">
+        <div class="uc-status">
+          <div class="pulse-dot dot-active" style="background: var(--p)"></div>
+          <span style="color: var(--p)">Operational</span>
+        </div>
+        <div class="uc-id">Created: {{formatTime(skill.createdAt)}}</div>
       </div>
     </div>
+  }
+</div>
 
-    <!-- Sidebar Configuration Area -->
-    <aside class="editor-sidebar">
-      <div class="config-group">
-        <h3>Model Configuration</h3>
-        
-        <div class="form-section">
-          <label for="modelName">Model</label>
-          <select id="modelName" formControlName="modelName">
-            <option value="gpt-4o">GPT-4o (Default)</option>
-            <option value="gpt-4-turbo">GPT-4 Turbo</option>
-            <option value="claude-3-5-sonnet">Claude 3.5 Sonnet</option>
-          </select>
+<!-- FORGE MODAL (SLIDE-OVER) -->
+<div class="modal-overlay" [class.open]="showEditor()" (click)="closeEditor()">
+  <div class="modal forge-modal" (click)="$event.stopPropagation()">
+    <div class="modal-top">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">Neural Forge</div>
+          <div class="modal-sub">Synthesize advanced AI behaviors and logic</div>
         </div>
+        <div class="modal-x" (click)="closeEditor()">✕</div>
+      </div>
+    </div>
+    
+    <form [formGroup]="skillForm" (ngSubmit)="onSubmit()">
+      <div class="modal-body forge-body">
+        <div class="forge-layout">
+          <div class="forge-main">
+            <div class="form-grp">
+              <label class="f-label">Skill Designation</label>
+              <input class="f-input" placeholder="e.g. Architect-V2" formControlName="name" />
+            </div>
+            
+            <div class="form-grp">
+              <label class="f-label">Cognitive Description</label>
+              <input class="f-input" placeholder="What is the primary function?" formControlName="description" />
+            </div>
 
-        <div class="form-section">
-          <div class="section-header">
-            <label for="temperature">Temperature</label>
-            <span class="value">{{ skillForm.get('temperature')?.value }}</span>
+            <div class="form-grp">
+              <label class="f-label">System Directive (Prompt)</label>
+              <textarea class="f-input forge-textarea" 
+                        placeholder="Define the core identity and behavioral constraints..." 
+                        formControlName="systemPrompt"></textarea>
+              <div class="forge-hint">Supports dynamic injection via {{ '{{context}}' }}</div>
+            </div>
           </div>
-          <input 
-            id="temperature" 
-            type="range" 
-            formControlName="temperature" 
-            min="0" max="2" step="0.1"
-          >
-          <div class="range-labels">
-            <span>Precise</span>
-            <span>Creative</span>
+
+          <div class="forge-side">
+            <div class="form-grp">
+              <label class="f-label">Intelligence Model</label>
+              <select class="f-input" formControlName="modelName">
+                <option value="gpt-4o">GPT-4o (Premium)</option>
+                <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                <option value="claude-3-5-sonnet">Claude 3.5 Sonnet</option>
+              </select>
+            </div>
+
+            <div class="form-grp">
+              <div class="f-label-row">
+                <label class="f-label">Entropy (Temp)</label>
+                <span class="f-val">{{skillForm.get('temperature')?.value}}</span>
+              </div>
+              <input type="range" class="forge-range" min="0" max="2" step="0.1" formControlName="temperature" />
+              <div class="range-labels">
+                <span>Deterministic</span>
+                <span>Creative</span>
+              </div>
+            </div>
+
+            <div class="form-grp">
+              <label class="f-label">Project Alignment</label>
+              <select class="f-input" formControlName="projectId">
+                @for (project of projects(); track project.id) {
+                  <option [value]="project.id">{{project.name}}</option>
+                }
+              </select>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="config-group">
-        <h3>Guardrails</h3>
-        <p class="empty-state">No guardrails defined yet. Complete skill setup to add policies.</p>
-        <button class="btn-glass" type="button">+ Add Policy</button>
+      <div class="modal-foot">
+        <button type="button" class="ghost-btn" (click)="closeEditor()">Abort</button>
+        <button type="submit" class="deploy-btn" [disabled]="skillForm.invalid || skillsStore.isLoading()">
+          <span class="material-symbols-rounded">bolt</span>
+          {{skillsStore.isLoading() ? 'Synthesizing...' : 'Initialize Skill'}}
+        </button>
       </div>
-    </aside>
-  </form>
+    </form>
+  </div>
 </div>

@@ -1,13 +1,13 @@
 import { signalStore, withState, withMethods, withHooks, patchState } from '@ngrx/signals';
 
-export type Theme = 'light' | 'dark';
+export type Theme = 'midnight' | 'slate' | 'forest' | 'void' | 'nebula';
 
 export interface ThemeState {
   theme: Theme;
 }
 
 const initialState: ThemeState = {
-  theme: (localStorage.getItem('theme') as Theme) || 'dark',
+  theme: (localStorage.getItem('theme') as Theme) || 'midnight',
 };
 
 export const ThemeStore = signalStore(
@@ -18,10 +18,6 @@ export const ThemeStore = signalStore(
       localStorage.setItem('theme', theme);
       document.documentElement.setAttribute('data-theme', theme);
       patchState(store, { theme });
-    },
-    toggleTheme() {
-      const newTheme = store.theme() === 'light' ? 'dark' : 'light';
-      this.setTheme(newTheme);
     },
     init() {
       document.documentElement.setAttribute('data-theme', store.theme());

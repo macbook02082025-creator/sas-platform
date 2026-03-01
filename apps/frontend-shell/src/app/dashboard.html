@@ -1,79 +1,142 @@
-<div class="bg-mesh">
-  <div class="mesh-orb-1"></div>
-  <div class="mesh-orb-2"></div>
-</div>
+<!-- Background Elements -->
+<canvas id="bg-canvas" #bgCanvas></canvas>
+<div class="grid-overlay"></div>
+<div class="cursor-glow" [style.left.px]="mouseX()" [style.top.px]="mouseY()"></div>
 
-<div class="dashboard-shell">
-  <!-- Floating Sidebar Island -->
+<div class="app">
+  <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="logo-container">
-      <div class="logo-visual"></div>
-      <span class="logo-text">AI LAB</span>
-    </div>
-
-    <nav class="sidebar-nav">
-      <ul>
-        <li *ngFor="let item of navItems">
-          <a [routerLink]="item.route" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-            <span class="icon material-symbols-rounded">{{ item.icon }}</span>
-            <span class="label">{{ item.label }}</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div class="user-pill" *ngIf="user()">
-        <div class="avatar"></div>
-        <div class="info">
-          <span class="name">{{ user()?.firstName }}</span>
+    <div class="logo-wrap">
+      <div class="logo">
+        <div class="logo-gem">⬡</div>
+        <div class="logo-text-wrap">
+          <div class="logo-name">AI LAB</div>
+          <div class="logo-ver">v3.2.1 · PROD</div>
         </div>
       </div>
-      <button (click)="onLogout()" class="logout-btn">
-        <span class="material-symbols-rounded">logout</span>
-        <span>Sign Out</span>
-      </button>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-section"><div class="nav-section-label">Core</div></div>
+
+      @for (item of navItems; track item.label) {
+        <div class="nav-item" [routerLink]="item.route" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          <div class="nav-accent"></div>
+          <div class="nav-icon-wrap">
+            <span class="material-symbols-rounded">{{item.icon}}</span>
+          </div>
+          {{item.label}}
+          @if (item.label === 'Intelligence') {
+            <div class="nav-right"><span class="nav-pill">{{projects().length}}</span><div class="nav-dot"></div></div>
+          }
+        </div>
+      }
+
+      <div class="nav-section"><div class="nav-section-label">Settings</div></div>
+
+      <div class="nav-item">
+        <div class="nav-accent"></div>
+        <div class="nav-icon-wrap"><span class="material-symbols-rounded">shield</span></div>
+        Security
+      </div>
+
+      <div class="nav-item">
+        <div class="nav-accent"></div>
+        <div class="nav-icon-wrap"><span class="material-symbols-rounded">credit_card</span></div>
+        Billing
+      </div>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="user-row">
+        <div class="avatar-ring">
+          <div class="avatar-inner">{{user()?.firstName?.[0] || 'U'}}</div>
+        </div>
+        <div class="user-meta">
+          <div class="user-name">{{user()?.firstName}} {{user()?.lastName}}</div>
+          <div class="user-plan">Admin · {{organization()?.name}}</div>
+        </div>
+        <div class="online-badge"><div class="online-dot"></div>Live</div>
+      </div>
+      <button class="sign-out-btn" (click)="onLogout()">↩ Sign Out</button>
     </div>
   </aside>
 
-  <!-- Main View Glass Canvas -->
-  <main class="main-content">
-    <header class="content-header">
+  <!-- MAIN -->
+  <main class="main" (mousemove)="onMouseMove($event)">
+    <!-- TOPBAR -->
+    <div class="topbar">
       <div class="breadcrumb">
-        PROJECTS <span class="current">/ OVERVIEW</span>
+        <span class="bc-dim">PROJECTS</span>
+        <span class="bc-sep">/</span>
+        <span class="bc-cur">{{pageTitle()}}</span>
       </div>
-      <div class="header-actions" style="display: flex; gap: 1rem; align-items: center;">
-        <button class="theme-toggle" (click)="themeStore.toggleTheme()">
-          <span class="material-symbols-rounded">{{ themeStore.theme() === 'light' ? 'dark_mode' : 'light_mode' }}</span>
-        </button>
-        <button class="btn-secondary">Feedback</button>
-        <button class="btn-primary" (click)="openNewProjectModal()" [disabled]="projectsStore.isLoading()">
-          + NEW PROJECT
-        </button>
+      <div class="topbar-mid">
+        <div class="cmd-bar">
+          <span class="cmd-icon">⌕</span>
+          <span class="cmd-text">Search units, vaults, commands…</span>
+          <div class="cmd-hint"><span class="kbd">⌘</span><span class="kbd">K</span></div>
+        </div>
       </div>
-    </header>
+      <div class="topbar-actions">
+        <!-- Theme Selector -->
+        <div class="theme-selector-wrap">
+          <div class="tb-btn" (click)="toggleThemeSelector()" [class.active]="showThemeSelector()">
+            <span class="material-symbols-rounded">palette</span>
+          </div>
+          
+          @if (showThemeSelector()) {
+            <div class="theme-dropdown">
+              <div class="dropdown-header">Appearance</div>
+              @for (theme of themes; track theme.id) {
+                <div class="theme-option" [class.selected]="currentTheme() === theme.id" (click)="setTheme(theme.id)">
+                  <div class="theme-color" [style.background]="theme.color"></div>
+                  <div class="theme-label">{{theme.label}}</div>
+                  @if (currentTheme() === theme.id) {
+                    <span class="material-symbols-rounded check">check</span>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
 
-    <div class="content-body">
-      <!-- Child routes like Overview, Knowledge Base, Skill Editor load here -->
+        <div class="tb-btn">📖</div>
+        <div class="tb-btn">
+          🔔<div class="tb-notif-dot"></div>
+        </div>
+        <button class="new-btn" (click)="dashboardService.openNewProjectModal()"><span>+</span> New Project</button>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
       <router-outlet></router-outlet>
     </div>
   </main>
+</div>
 
-  <!-- High-End Dialog Modal -->
-  <div class="modal-overlay" *ngIf="showProjectModal()" (click)="closeModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <h2>Initialize Project</h2>
-      <input 
-        type="text" 
-        [(ngModel)]="newProjectName" 
-        placeholder="PROJECT IDENTIFIER"
-        (keyup.enter)="createProject()"
-        autoFocus
-      >
-      <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-        <button style="background: transparent; color: var(--text-secondary); border: none; cursor: pointer; font-weight: 700; font-size: 0.8125rem;" (click)="closeModal()">ABORT</button>
-        <button class="btn-primary" (click)="createProject()" [disabled]="!newProjectName()">INITIALIZE</button>
+<!-- New Project Modal -->
+<div class="modal-overlay" [class.open]="dashboardService.showProjectModal()" (click)="dashboardService.closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-top">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">New Intelligence Unit</div>
+          <div class="modal-sub">Deploy a new AI unit connected to your vault network</div>
+        </div>
+        <div class="modal-x" (click)="dashboardService.closeModal()">✕</div>
       </div>
+    </div>
+    <div class="modal-body">
+      <div class="form-grp">
+        <label class="f-label">Project Name</label>
+        <input class="f-input" placeholder="my-unit-01" [ngModel]="dashboardService.newProjectName()" (ngModelChange)="dashboardService.newProjectName.set($event)" />
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="ghost-btn" (click)="dashboardService.closeModal()">Cancel</button>
+      <button class="deploy-btn" (click)="createProject()">⚡ Deploy Unit</button>
     </div>
   </div>
 </div>

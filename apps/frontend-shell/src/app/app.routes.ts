@@ -28,7 +28,7 @@ export const appRoutes: Route[] = [
         loadComponent: () => import('./overview'),
       },
       {
-        path: 'skills/create',
+        path: 'skills',
         loadComponent: () =>
           import('./skills').then((m) => m.SkillEditorComponent),
       },
