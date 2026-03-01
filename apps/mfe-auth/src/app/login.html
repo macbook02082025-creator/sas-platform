@@ -1,0 +1,45 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1>Welcome back</h1>
+      <p>Log in to your AI Frontend Lab account</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input 
+          id="email" 
+          type="email" 
+          formControlName="email" 
+          placeholder="name@company.com"
+          [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          id="password" 
+          type="password" 
+          formControlName="password" 
+          placeholder="••••••••"
+          [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+        >
+      </div>
+
+      <div *ngIf="authStore.error()" class="error-message">
+        {{ authStore.error() }}
+      </div>
+
+      <button type="submit" [disabled]="loginForm.invalid || authStore.isLoading()" class="btn-primary">
+        <span *ngIf="!authStore.isLoading()">Continue with Email</span>
+        <span *ngIf="authStore.isLoading()" class="spinner"></span>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Don't have an account? <a href="/auth/signup">Sign up</a></p>
+    </div>
+  </div>
+</div>

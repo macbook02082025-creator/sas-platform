@@ -1,0 +1,79 @@
+<div class="bg-mesh">
+  <div class="mesh-orb-1"></div>
+  <div class="mesh-orb-2"></div>
+</div>
+
+<div class="dashboard-shell">
+  <!-- Floating Sidebar Island -->
+  <aside class="sidebar">
+    <div class="logo-container">
+      <div class="logo-visual"></div>
+      <span class="logo-text">AI LAB</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <ul>
+        <li *ngFor="let item of navItems">
+          <a [routerLink]="item.route" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+            <span class="icon material-symbols-rounded">{{ item.icon }}</span>
+            <span class="label">{{ item.label }}</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-pill" *ngIf="user()">
+        <div class="avatar"></div>
+        <div class="info">
+          <span class="name">{{ user()?.firstName }}</span>
+        </div>
+      </div>
+      <button (click)="onLogout()" class="logout-btn">
+        <span class="material-symbols-rounded">logout</span>
+        <span>Sign Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main View Glass Canvas -->
+  <main class="main-content">
+    <header class="content-header">
+      <div class="breadcrumb">
+        PROJECTS <span class="current">/ OVERVIEW</span>
+      </div>
+      <div class="header-actions" style="display: flex; gap: 1rem; align-items: center;">
+        <button class="theme-toggle" (click)="themeStore.toggleTheme()">
+          <span class="material-symbols-rounded">{{ themeStore.theme() === 'light' ? 'dark_mode' : 'light_mode' }}</span>
+        </button>
+        <button class="btn-secondary">Feedback</button>
+        <button class="btn-primary" (click)="openNewProjectModal()" [disabled]="projectsStore.isLoading()">
+          + NEW PROJECT
+        </button>
+      </div>
+    </header>
+
+    <div class="content-body">
+      <!-- Child routes like Overview, Knowledge Base, Skill Editor load here -->
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+
+  <!-- High-End Dialog Modal -->
+  <div class="modal-overlay" *ngIf="showProjectModal()" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2>Initialize Project</h2>
+      <input 
+        type="text" 
+        [(ngModel)]="newProjectName" 
+        placeholder="PROJECT IDENTIFIER"
+        (keyup.enter)="createProject()"
+        autoFocus
+      >
+      <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+        <button style="background: transparent; color: var(--text-secondary); border: none; cursor: pointer; font-weight: 700; font-size: 0.8125rem;" (click)="closeModal()">ABORT</button>
+        <button class="btn-primary" (click)="createProject()" [disabled]="!newProjectName()">INITIALIZE</button>
+      </div>
+    </div>
+  </div>
+</div>

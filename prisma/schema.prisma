@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id              String         @id @default(uuid())
+  email           String         @unique
+  passwordHash    String
+  firstName       String?
+  lastName        String?
+  role            Role           @default(ENGINEER)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  memberships     OrganizationMember[]
+}
+
+model Organization {
+  id              String         @id @default(uuid())
+  name            String
+  slug            String         @unique
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  members         OrganizationMember[]
+  projects        Project[]
+}
+
+model OrganizationMember {
+  id              String         @id @default(uuid())
+  role            OrgRole        @default(MEMBER)
+  userId          String
+  user            User           @relation(fields: [userId], references: [id])
+  organizationId  String
+  organization    Organization   @relation(fields: [organizationId], references: [id])
+
+  @@unique([userId, organizationId])
+}
+
+model Project {
+  id              String         @id @default(uuid())
+  name            String
+  organizationId  String
+  organization    Organization   @relation(fields: [organizationId], references: [id])
+  skills          Skill[]
+  apiKeys         ApiKey[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model ApiKey {
+  id              String         @id @default(uuid())
+  name            String
+  keyHash         String         @unique
+  prefix          String
+  projectId       String
+  project         Project        @relation(fields: [projectId], references: [id])
+  lastUsedAt      DateTime?
+  expiresAt       DateTime?
+  createdAt       DateTime       @default(now())
+}
+
+model Skill {
+  id              String         @id @default(uuid())
+  name            String
+  description     String?
+  systemPrompt    String
+  temperature     Float          @default(0.7)
+  modelName       String         @default("gpt-4o")
+  projectId       String
+  project         Project        @relation(fields: [projectId], references: [id])
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+enum Role {
+  ADMIN
+  USER
+  ENGINEER
+  REVIEWER
+}
+
+enum OrgRole {
+  OWNER
+  ADMIN
+  MEMBER
+}

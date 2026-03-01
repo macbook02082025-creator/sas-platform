@@ -1,0 +1,58 @@
+<div class="kb-container">
+  <header class="section-header">
+    <div class="header-left">
+      <span class="material-symbols-rounded">database</span>
+      <h1>Knowledge Base</h1>
+    </div>
+    <div class="header-actions">
+      <button class="btn-primary" (click)="fileInput.click()">
+        <span class="material-symbols-rounded">upload</span>
+        UPLOAD SOURCE
+      </button>
+      <input #fileInput type="file" style="display: none" (change)="onFileSelected($event)" multiple>
+    </div>
+  </header>
+
+  <div class="kb-layout">
+    <!-- Drag & Drop Zone -->
+    <div class="upload-zone" [class.dragging]="isDragging()" (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)">
+      <div class="zone-content">
+        <div class="icon-stack">
+          <span class="material-symbols-rounded">cloud_upload</span>
+        </div>
+        <h3>Ingest Intelligence</h3>
+        <p>Drop PDF, Markdown or Text files here to augment your AI units.</p>
+        <span class="hint">Max file size: 25MB</span>
+      </div>
+    </div>
+
+    <!-- Active Documents -->
+    <div class="docs-section">
+      <div class="section-meta">
+        <h3>ACTIVE SOURCES</h3>
+        <span class="count">{{ documents().length }} FILES</span>
+      </div>
+
+      <div class="docs-list">
+        <div class="empty-docs" *ngIf="!documents().length">
+          <span class="material-symbols-rounded">find_in_page</span>
+          <p>No documents indexed yet.</p>
+        </div>
+
+        <div class="doc-item" *ngFor="let doc of documents()">
+          <div class="doc-icon">
+            <span class="material-symbols-rounded">description</span>
+          </div>
+          <div class="doc-info">
+            <span class="doc-name">{{ doc.name }}</span>
+            <span class="doc-meta">{{ doc.size }} • {{ doc.status }}</span>
+          </div>
+          <div class="doc-actions">
+            <button class="action-btn"><span class="material-symbols-rounded">visibility</span></button>
+            <button class="action-btn delete"><span class="material-symbols-rounded">delete</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

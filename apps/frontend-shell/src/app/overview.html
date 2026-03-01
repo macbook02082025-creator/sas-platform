@@ -1,0 +1,26 @@
+<div class="overview-container">
+  <!-- Welcome Section -->
+  <div class="welcome-hero" *ngIf="!projects().length && !projectsStore.isLoading()" style="text-align: center; margin-top: 5rem;">
+    <h2 style="font-size: 3.5rem; font-weight: 900; letter-spacing: -0.05em; margin-bottom: 1.5rem;">Unleash Reliable AI</h2>
+    <p style="color: var(--text-secondary); font-size: 1.25rem; margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">Define skills, set guardrails, and build with 100% confidence.</p>
+  </div>
+
+  <!-- Real Bento Grid for Projects -->
+  <div class="active-projects" *ngIf="projects().length">
+    <h3 style="margin-bottom: 2rem; color: var(--text-tertiary); font-size: 0.75rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;">
+      Intelligence Projects ({{ projects().length }})
+    </h3>
+    
+    <div class="bento-grid">
+      <div class="project-card" *ngFor="let project of projects()">
+        <div class="project-icon material-symbols-rounded">folder_open</div>
+        <h4>{{ project.name }}</h4>
+        <p class="desc">Ready for skill deployment. Connected to master knowledge vault.</p>
+        <div class="meta">
+          <span>UNITS: 0</span>
+          <span>EST: {{ project.createdAt | date:'MMM dd' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

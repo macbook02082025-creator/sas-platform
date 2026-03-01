@@ -1,0 +1,26 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2020", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "noImplicitAny": false,
+    "strict": false,
+    "paths": {
+      "mfeAuth/Routes": ["apps/mfe-auth/src/app/remote-entry/entry.routes.ts"],
+      "@sas-platform/shared-ui": ["libs/shared/ui/src/index.ts"],
+      "@sas-platform/shared-core": ["libs/shared/core/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

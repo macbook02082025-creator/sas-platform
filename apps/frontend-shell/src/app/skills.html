@@ -1,0 +1,81 @@
+<div class="editor-container">
+  <header class="editor-header">
+    <div class="header-left">
+      <span class="material-symbols-rounded">bolt</span>
+      <h1>Create AI Skill</h1>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" type="button">Cancel</button>
+      <button class="btn-primary" (click)="onSubmit()" [disabled]="skillForm.invalid || skillsStore.isLoading()">
+        <span *ngIf="!skillsStore.isLoading()">Save Skill</span>
+        <span *ngIf="skillsStore.isLoading()" class="spinner"></span>
+      </button>
+    </div>
+  </header>
+
+  <form [formGroup]="skillForm" class="editor-layout">
+    <!-- Main Form Area -->
+    <div class="editor-main">
+      <div class="form-section">
+        <label for="name">Skill Name</label>
+        <input id="name" type="text" formControlName="name" placeholder="e.g. FAQ Assistant">
+      </div>
+
+      <div class="form-section">
+        <label for="description">Description</label>
+        <input id="description" type="text" formControlName="description" placeholder="What does this skill do?">
+      </div>
+
+      <div class="form-section prompt-section">
+        <div class="section-header">
+          <label for="systemPrompt">System Prompt</label>
+          <span class="badge">Dynamic Variables Support {{ '{{variable}}' }}</span>
+        </div>
+        <textarea 
+          id="systemPrompt" 
+          formControlName="systemPrompt" 
+          placeholder="You are a helpful assistant that..."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Sidebar Configuration Area -->
+    <aside class="editor-sidebar">
+      <div class="config-group">
+        <h3>Model Configuration</h3>
+        
+        <div class="form-section">
+          <label for="modelName">Model</label>
+          <select id="modelName" formControlName="modelName">
+            <option value="gpt-4o">GPT-4o (Default)</option>
+            <option value="gpt-4-turbo">GPT-4 Turbo</option>
+            <option value="claude-3-5-sonnet">Claude 3.5 Sonnet</option>
+          </select>
+        </div>
+
+        <div class="form-section">
+          <div class="section-header">
+            <label for="temperature">Temperature</label>
+            <span class="value">{{ skillForm.get('temperature')?.value }}</span>
+          </div>
+          <input 
+            id="temperature" 
+            type="range" 
+            formControlName="temperature" 
+            min="0" max="2" step="0.1"
+          >
+          <div class="range-labels">
+            <span>Precise</span>
+            <span>Creative</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-group">
+        <h3>Guardrails</h3>
+        <p class="empty-state">No guardrails defined yet. Complete skill setup to add policies.</p>
+        <button class="btn-glass" type="button">+ Add Policy</button>
+      </div>
+    </aside>
+  </form>
+</div>

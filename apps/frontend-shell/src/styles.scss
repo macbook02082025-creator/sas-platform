@@ -1,0 +1,93 @@
+:root {
+  /* Dynamic Variables - Dark (Midnight Space) */
+  --bg-app: #020204;
+  --bg-surface: rgba(10, 10, 15, 0.7);
+  --bg-island: rgba(255, 255, 255, 0.03);
+  --bg-island-hover: rgba(255, 255, 255, 0.06);
+  
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  --border-accent: rgba(99, 102, 241, 0.3);
+  
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #475569;
+  
+  --accent-main: #6366f1;
+  --accent-glow: rgba(99, 102, 241, 0.4);
+  
+  --glass-blur: blur(20px);
+  --transition-speed: 0.4s;
+  --ease-in-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+[data-theme='light'] {
+  --bg-app: #f1f5f9;
+  --bg-surface: rgba(255, 255, 255, 0.8);
+  --bg-island: rgba(0, 0, 0, 0.02);
+  --bg-island-hover: rgba(0, 0, 0, 0.04);
+  
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  --border-accent: rgba(99, 102, 241, 0.2);
+  
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #94a3b8;
+  
+  --accent-main: #4f46e5;
+  --accent-glow: rgba(79, 70, 229, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  height: 100vh;
+  overflow: hidden;
+  transition: background-color var(--transition-speed) var(--ease-in-out-expo);
+}
+
+/* Reset Links and Lists */
+a { text-decoration: none !important; color: inherit; }
+ul, li { list-style: none; padding: 0; margin: 0; }
+
+/* The Moving Mesh Background */
+.bg-mesh {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  filter: blur(100px);
+}
+
+.mesh-orb-1 {
+  position: absolute; top: -10%; left: -10%; width: 50%; height: 50%;
+  background: radial-gradient(circle, var(--accent-main) 0%, transparent 70%);
+  opacity: 0.15; animation: moveOrb 20s infinite alternate;
+}
+
+.mesh-orb-2 {
+  position: absolute; bottom: -10%; right: -10%; width: 40%; height: 40%;
+  background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+  opacity: 0.1; animation: moveOrb 25s infinite alternate-reverse;
+}
+
+@keyframes moveOrb {
+  from { transform: translate(0, 0); }
+  to { transform: translate(20%, 20%); }
+}
+
+.material-symbols-rounded {
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+  font-size: 20px;
+}
