@@ -135,14 +135,33 @@ To maintain the "Top 1%" standard, every contribution must adhere to:
 - **Logging:** Structured JSON logging via Pino/Winston.
 
 ---
+### 🛠️ Getting Started
 
-## 🗺️ Roadmap
+1.  **Clone the repository**
+2.  **Environment Setup:** Copy `.env.example` to `.env` (or create one).
+    *   `DATABASE_URL="file:./dev.db"` (SQLite)
+    *   `OPENAI_API_KEY`: Optional. If not provided, the **AI Engine runs in Mock Mode** with simulated responses.
+3.  **Install Dependencies:** `npm install`
+4.  **Database Migration:** `npx prisma migrate dev`
+5.  **Run All Applications:** `npm run start:all`
+
+---
+## 🧪 Mock Mode
+No OpenAI API Key? No problem. The platform includes a built-in **Mock Mode** for the AI Engine. 
+- **Simulated Chat:** Returns predefined streaming text.
+- **Simulated RAG:** Bypasses vector search and returns a contextual placeholder.
+- **Full UI Access:** All dashboard features remain functional.
+
+---
+## 🗺️ Roadmap & Phase Status
+
 - [x] Initial Monorepo Scaffolding (Nx + Angular 21)
 - [x] MFE Auth Integration
-- [ ] Multi-tenant Dashboard Core
-- [ ] LangChain RAG validation layer
-- [ ] Real-time SSE Chat remote
-- [ ] Skill Creation workflow with sandbox execution
+- [x] Multi-tenant Dashboard Core
+- [x] LangChain RAG validation layer
+- [x] Real-time SSE Chat remote
+- [x] Skill Creation workflow with sandbox execution
+- [x] Skill/Project Update & Deletion (Full CRUD)
 
 ---
 

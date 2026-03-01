@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ActivityService } from './activity.service';
 import { ActivityController } from './activity.controller';
-import { PrismaService } from '../prisma.service';
 
 @Module({
   controllers: [ActivityController],
-  providers: [ActivityService, PrismaService],
+  providers: [ActivityService],
   exports: [ActivityService],
 })
 export class ActivityModule {}

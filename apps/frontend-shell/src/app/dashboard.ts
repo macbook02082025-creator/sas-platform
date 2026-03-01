@@ -27,7 +27,14 @@ export default class DashboardComponent implements AfterViewInit {
   mouseY = signal(0);
 
   showThemeSelector = signal(false);
+  showOrgSwitcher = signal(false);
+
   readonly currentTheme = computed(() => this.themeStore.theme());
+  readonly currentOrganization = computed(() => {
+    const orgId = this.authStore.currentOrganizationId();
+    return this.authStore.user()?.organizations?.find(o => o.id === orgId);
+  });
+
   readonly themes: { id: Theme; label: string; color: string }[] = [
     { id: 'midnight', label: 'Midnight', color: '#7c6fff' },
     { id: 'slate', label: 'Slate Blue', color: '#38bdf8' },
@@ -45,7 +52,6 @@ export default class DashboardComponent implements AfterViewInit {
   );
 
   readonly user = computed(() => this.authStore.user());
-  readonly organization = computed(() => this.user()?.organization);
   readonly projects = computed(() => this.projectsStore.projects());
   
   readonly navItems = [
@@ -79,12 +85,25 @@ export default class DashboardComponent implements AfterViewInit {
     this.mouseY.set(event.clientY);
   }
 
-  createProject() {
-    const name = this.dashboardService.newProjectName();
-    const description = this.dashboardService.newProjectDescription();
+  saveProject() {
+    const name = this.dashboardService.projectName();
+    const description = this.dashboardService.projectDescription();
+    const mode = this.dashboardService.modalMode();
+    const id = this.dashboardService.editingProjectId();
+
     if (name.trim()) {
-      this.projectsStore.createProject({ name, description });
+      if (mode === 'create') {
+        this.projectsStore.createProject({ name, description });
+      } else if (id) {
+        this.projectsStore.updateProject({ id, name, description });
+      }
       this.dashboardService.closeModal();
+    }
+  }
+
+  deleteProject(id: string) {
+    if (confirm('Are you sure you want to decommission this intelligence unit? This action cannot be reversed.')) {
+      this.projectsStore.deleteProject(id);
     }
   }
 
@@ -99,6 +118,11 @@ export default class DashboardComponent implements AfterViewInit {
   setTheme(theme: Theme) {
     this.themeStore.setTheme(theme);
     this.showThemeSelector.set(false);
+  }
+
+  switchOrganization(id: string) {
+    this.authStore.setOrganization(id);
+    this.showOrgSwitcher.set(false);
   }
 
   private initCanvas() {

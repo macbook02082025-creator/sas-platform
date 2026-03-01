@@ -34,9 +34,9 @@ model OrganizationMember {
   id              String         @id @default(uuid())
   role            OrgRole        @default(MEMBER)
   userId          String
-  user            User           @relation(fields: [userId], references: [id])
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   organizationId  String
-  organization    Organization   @relation(fields: [organizationId], references: [id])
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@unique([userId, organizationId])
 }
@@ -60,7 +60,7 @@ model Activity {
   type            String         // e.g., "PROJECT_CREATED", "SKILL_CREATED"
   description     String
   projectId       String?
-  project         Project?       @relation(fields: [projectId], references: [id])
+  project         Project?       @relation(fields: [projectId], references: [id], onDelete: Cascade)
   organizationId  String
   organization    Organization   @relation(fields: [organizationId], references: [id])
   createdAt       DateTime       @default(now())
@@ -72,7 +72,7 @@ model ApiKey {
   keyHash         String         @unique
   prefix          String
   projectId       String
-  project         Project        @relation(fields: [projectId], references: [id])
+  project         Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
   lastUsedAt      DateTime?
   expiresAt       DateTime?
   createdAt       DateTime       @default(now())
@@ -86,7 +86,7 @@ model Skill {
   temperature     Float          @default(0.7)
   modelName       String         @default("gpt-4o")
   projectId       String
-  project         Project        @relation(fields: [projectId], references: [id])
+  project         Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 }

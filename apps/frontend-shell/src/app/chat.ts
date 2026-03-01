@@ -2,7 +2,7 @@ import { Component, inject, signal, computed, OnInit, ElementRef, ViewChild, Aft
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ProjectsStore, SkillsStore } from '@sas-platform/shared-core';
+import { ProjectsStore, SkillsStore, AuthStore } from '@sas-platform/shared-core';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -22,6 +22,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   private route = inject(ActivatedRoute);
   private projectsStore = inject(ProjectsStore);
   private skillsStore = inject(SkillsStore);
+  private authStore = inject(AuthStore);
 
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
@@ -33,6 +34,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   project = computed(() => 
     this.projectsStore.projects().find(p => p.id === this.projectId())
   );
+
+  skills = computed(() => this.skillsStore.skills());
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -54,9 +57,20 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     this.scrollToBottom();
   }
 
-  sendMessage() {
+  async sendMessage() {
     const text = this.userInput().trim();
     if (!text || this.isThinking()) return;
+
+    // Use the first skill of the project if available, otherwise we can't really chat properly
+    const activeSkill = this.skills()[0];
+    if (!activeSkill) {
+      this.messages.update(prev => [...prev, {
+        role: 'assistant',
+        content: 'No active skill found for this project. Please forge a skill first.',
+        timestamp: new Date()
+      }]);
+      return;
+    }
 
     const userMsg: Message = {
       role: 'user',
@@ -68,35 +82,81 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     this.userInput.set('');
     this.isThinking.set(true);
 
-    // Mock streaming response for now (Week 4 real SSE integration coming)
-    setTimeout(() => {
-      const assistantMsg: Message = {
-        role: 'assistant',
-        content: '',
-        timestamp: new Date(),
-        isStreaming: true
-      };
-      this.messages.update(prev => [...prev, assistantMsg]);
+    const assistantMsg: Message = {
+      role: 'assistant',
+      content: '',
+      timestamp: new Date(),
+      isStreaming: true
+    };
+    this.messages.update(prev => [...prev, assistantMsg]);
+
+    try {
+      const response = await fetch('/api/v1/chat/stream', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'x-tenant-id': localStorage.getItem('tenant_id') || ''
+        },
+        body: JSON.stringify({
+          skillId: activeSkill.id,
+          user_input: text
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to connect to neural engine');
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
       
-      const fullResponse = "Based on my current neural configuration and indexed metadata, I've analyzed your request. I am processing the context through the active skills lab protocols.";
-      let i = 0;
-      const interval = setInterval(() => {
-        this.messages.update(msgs => {
-          const last = msgs[msgs.length - 1];
-          last.content = fullResponse.substring(0, i);
-          return [...msgs];
-        });
-        i += 3;
-        if (i > fullResponse.length) {
-          clearInterval(interval);
-          this.isThinking.set(false);
-          this.messages.update(msgs => {
-            msgs[msgs.length - 1].isStreaming = false;
-            return [...msgs];
-          });
+      if (!reader) throw new Error('No readable stream');
+
+      let accumulatedContent = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.substring(6));
+              if (data.content) {
+                accumulatedContent += data.content;
+                this.messages.update(msgs => {
+                  const last = msgs[msgs.length - 1];
+                  last.content = accumulatedContent;
+                  return [...msgs];
+                });
+              }
+            } catch (e) {
+              // Ignore partial JSON or non-JSON lines
+            }
+          } else if (line.startsWith('event: end')) {
+            // Stream finished
+          }
         }
-      }, 30);
-    }, 1000);
+      }
+
+      this.isThinking.set(false);
+      this.messages.update(msgs => {
+        msgs[msgs.length - 1].isStreaming = false;
+        return [...msgs];
+      });
+
+    } catch (error: any) {
+      console.error('Chat Error:', error);
+      this.isThinking.set(false);
+      this.messages.update(msgs => {
+        const last = msgs[msgs.length - 1];
+        last.content = 'Neural link interrupted: ' + error.message;
+        last.isStreaming = false;
+        return [...msgs];
+      });
+    }
   }
 
   private scrollToBottom(): void {

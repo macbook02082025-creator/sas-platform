@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 
 export interface AuthState {
   user: User | null;
+  currentOrganizationId: string | null;
   isLoading: boolean;
   error: string | null;
   isAuthenticated: boolean;
@@ -14,6 +15,7 @@ export interface AuthState {
 
 const initialState: AuthState = {
   user: null,
+  currentOrganizationId: localStorage.getItem('tenant_id'),
   isLoading: false,
   error: null,
   isAuthenticated: false,
@@ -25,26 +27,22 @@ export const AuthStore = signalStore(
   withMethods((store, authService = inject(AuthService), router = inject(Router)) => ({
     login: rxMethod<any>(
       pipe(
-        tap(() => {
-          console.log('AuthStore: Starting Login...');
-          patchState(store, { isLoading: true, error: null });
-        }),
+        tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((credentials) =>
           authService.login(credentials).pipe(
             tap((response: AuthResponse) => {
-              console.log('AuthStore: Login Success', response);
+              const orgId = response.user.organizations?.[0]?.id || null;
+              if (orgId) localStorage.setItem('tenant_id', orgId);
+              
               patchState(store, {
                 user: response.user,
+                currentOrganizationId: orgId,
                 isAuthenticated: true,
                 isLoading: false,
               });
-              console.log('AuthStore: Navigating to dashboard...');
-              router.navigate(['/dashboard']).then(navigated => {
-                console.log('AuthStore: Navigation finished', navigated);
-              });
+              router.navigate(['/dashboard']);
             }),
             catchError((err) => {
-              console.error('AuthStore: Login Error', err);
               patchState(store, {
                 isLoading: false,
                 error: err.error?.message || 'Login failed',
@@ -61,8 +59,12 @@ export const AuthStore = signalStore(
         switchMap((data) =>
           authService.register(data).pipe(
             tap((response: AuthResponse) => {
+              const orgId = response.user.organizations?.[0]?.id || null;
+              if (orgId) localStorage.setItem('tenant_id', orgId);
+
               patchState(store, {
                 user: response.user,
+                currentOrganizationId: orgId,
                 isAuthenticated: true,
                 isLoading: false,
               });
@@ -79,29 +81,55 @@ export const AuthStore = signalStore(
         )
       )
     ),
+    setOrganization(id: string) {
+      localStorage.setItem('tenant_id', id);
+      patchState(store, { currentOrganizationId: id });
+      // Force reload to refresh all data stores with the new tenant context
+      window.location.reload();
+    },
     logout() {
-      console.log('AuthStore: Logging out');
       authService.logout();
-      patchState(store, initialState);
+      localStorage.removeItem('tenant_id');
+      patchState(store, {
+        user: null,
+        currentOrganizationId: null,
+        isAuthenticated: false,
+        isLoading: false,
+        error: null
+      });
       router.navigate(['/auth/login']);
     },
     init() {
       const token = authService.getToken();
-      console.log('AuthStore: Initializing with token:', !!token);
       if (token) {
         patchState(store, { isLoading: true });
         authService.me().subscribe({
           next: (user) => {
-            console.log('AuthStore: Session restored', user);
-            patchState(store, { user, isAuthenticated: true, isLoading: false });
+            let orgId = store.currentOrganizationId();
+            if (!orgId || !user.organizations?.find(o => o.id === orgId)) {
+              orgId = user.organizations?.[0]?.id || null;
+            }
+            
+            if (orgId) localStorage.setItem('tenant_id', orgId);
+
+            patchState(store, { 
+              user, 
+              currentOrganizationId: orgId,
+              isAuthenticated: true, 
+              isLoading: false 
+            });
             if (window.location.pathname.startsWith('/auth')) {
               router.navigate(['/dashboard']);
             }
           },
           error: (err) => {
-            console.warn('AuthStore: Token invalid or expired', err);
             authService.logout();
-            patchState(store, { user: null, isAuthenticated: false, isLoading: false });
+            patchState(store, {
+              user: null,
+              currentOrganizationId: null,
+              isAuthenticated: false,
+              isLoading: false
+            });
           }
         });
       }

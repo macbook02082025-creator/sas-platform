@@ -63,6 +63,45 @@ export const ProjectsStore = signalStore(
           )
         )
       )
+    ),
+    updateProject: rxMethod<{ id: string; name?: string; description?: string }>(
+      pipe(
+        tap(() => patchState(store, { isLoading: true })),
+        switchMap((data) => {
+          const { id, ...payload } = data;
+          return http.post<Project>(`/api/v1/projects/${id}`, payload).pipe(
+            tap((updatedProject) => 
+              patchState(store, { 
+                projects: store.projects().map(p => p.id === id ? updatedProject : p), 
+                isLoading: false 
+              })
+            ),
+            catchError((err) => {
+              patchState(store, { isLoading: false, error: err.message });
+              return of(null);
+            })
+          );
+        })
+      )
+    ),
+    deleteProject: rxMethod<string>(
+      pipe(
+        tap(() => patchState(store, { isLoading: true })),
+        switchMap((id) =>
+          http.post(`/api/v1/projects/${id}/delete`, {}).pipe(
+            tap(() => 
+              patchState(store, { 
+                projects: store.projects().filter(p => p.id !== id), 
+                isLoading: false 
+              })
+            ),
+            catchError((err) => {
+              patchState(store, { isLoading: false, error: err.message });
+              return of(null);
+            })
+          )
+        )
+      )
     )
   }))
 );

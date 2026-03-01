@@ -29,7 +29,20 @@
         <div class="uc-icon" style="background: linear-gradient(135deg, var(--p), #be185d)">
           <span class="material-symbols-rounded" style="font-size: 20px">bolt</span>
         </div>
-        <div class="uc-menu">⋯</div>
+        <div class="uc-menu-wrap" (click)="$event.stopPropagation()">
+          <div class="uc-menu" (click)="toggleMenu($event, skill.id)">⋯</div>
+          @if (activeMenuId() === skill.id) {
+            <div class="action-dropdown">
+              <div class="ad-item" (click)="openEditEditor($event, skill)">
+                <span class="material-symbols-rounded">edit</span> Modify Core
+              </div>
+              <div class="ad-sep"></div>
+              <div class="ad-item ad-danger" (click)="deleteSkill($event, skill.id)">
+                <span class="material-symbols-rounded">delete</span> Erase Skill
+              </div>
+            </div>
+          }
+        </div>
       </div>
       <div class="uc-name">{{skill.name}}</div>
       <div class="uc-desc">{{skill.description || 'Cognitive logic core initialized. Ready for neural processing.'}}</div>
@@ -56,8 +69,8 @@
     <div class="modal-top">
       <div class="modal-header">
         <div>
-          <div class="modal-title">Neural Forge</div>
-          <div class="modal-sub">Synthesize advanced AI behaviors and logic</div>
+          <div class="modal-title">{{modalMode() === 'create' ? 'Neural Forge' : 'Core Calibration'}}</div>
+          <div class="modal-sub">{{modalMode() === 'create' ? 'Synthesize advanced AI behaviors and logic' : 'Recalibrate the behavioral constraints of this skill'}}</div>
         </div>
         <div class="modal-x" (click)="closeEditor()">✕</div>
       </div>
@@ -83,6 +96,36 @@
                         placeholder="Define the core identity and behavioral constraints..." 
                         formControlName="systemPrompt"></textarea>
               <div class="forge-hint">Supports dynamic injection via {{ '{{context}}' }}</div>
+            </div>
+
+            <!-- SANDBOX SECTION -->
+            <div class="forge-sandbox">
+              <div class="sandbox-header">
+                <span class="material-symbols-rounded">science</span>
+                Neural Sandbox
+              </div>
+              <div class="sandbox-body">
+                <div class="sandbox-input-row">
+                  <input class="f-input sandbox-input" 
+                         placeholder="Test your neural configuration..." 
+                         [value]="testInput()"
+                         (input)="testInput.set($any($event.target).value)"
+                         (keyup.enter)="runTest()" />
+                  <button type="button" class="test-btn" [disabled]="isTesting() || !skillForm.get('systemPrompt')?.value" (click)="runTest()">
+                    @if (isTesting()) {
+                      <div class="loader-dots"><span></span><span></span><span></span></div>
+                    } @else {
+                      <span class="material-symbols-rounded">play_arrow</span>
+                    }
+                  </button>
+                </div>
+                @if (testResponse()) {
+                  <div class="sandbox-response">
+                    <div class="sr-label">Assistant Response</div>
+                    <div class="sr-content">{{testResponse()}}</div>
+                  </div>
+                }
+              </div>
             </div>
           </div>
 
@@ -124,7 +167,7 @@
         <button type="button" class="ghost-btn" (click)="closeEditor()">Abort</button>
         <button type="submit" class="deploy-btn" [disabled]="skillForm.invalid || skillsStore.isLoading()">
           <span class="material-symbols-rounded">bolt</span>
-          {{skillsStore.isLoading() ? 'Synthesizing...' : 'Initialize Skill'}}
+          {{skillsStore.isLoading() ? 'Processing...' : (modalMode() === 'create' ? 'Initialize Skill' : 'Commit Calibration')}}
         </button>
       </div>
     </form>

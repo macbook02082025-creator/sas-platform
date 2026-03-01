@@ -57,7 +57,7 @@ export class AuthService {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        organization: user.memberships[0].organization,
+        organizations: user.memberships.map((m) => m.organization),
       },
     };
   }
@@ -81,7 +81,7 @@ export class AuthService {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      organization: user.memberships[0]?.organization,
+      organizations: user.memberships.map((m) => m.organization),
     };
   }
 
@@ -109,7 +109,7 @@ export class AuthService {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        organization: user.memberships[0]?.organization,
+        organizations: user.memberships.map((m) => m.organization),
       },
     };
   }

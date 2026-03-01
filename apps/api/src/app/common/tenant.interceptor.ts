@@ -21,13 +21,24 @@ export class TenantInterceptor implements NestInterceptor {
     }
 
     // Find the organization this user belongs to
-    const membership = await this.prisma.organizationMember.findFirst({
-      where: { userId: user.sub },
-      include: { organization: true },
-    });
+    const tenantIdFromHeader = request.headers['x-tenant-id'] as string;
+
+    const membership = (await this.prisma.organizationMember.findFirst({
+      where: {
+        userId: request.user.sub,
+        ...(tenantIdFromHeader ? { organizationId: tenantIdFromHeader } : {}),
+      },
+      include: {
+        organization: true,
+      },
+    })) as any;
 
     if (!membership) {
-      throw new UnauthorizedException('User does not belong to any organization');
+      throw new UnauthorizedException(
+        tenantIdFromHeader
+          ? 'Access to this organization is denied'
+          : 'User does not belong to any organization'
+      );
     }
 
     // Attach tenant info to request

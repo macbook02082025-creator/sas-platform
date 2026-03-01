@@ -1,7 +1,7 @@
 import { Component, inject, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { SkillsStore, ProjectsStore } from '@sas-platform/shared-core';
+import { SkillsStore, ProjectsStore, Skill } from '@sas-platform/shared-core';
 
 @Component({
   selector: 'app-skill-editor',
@@ -16,9 +16,19 @@ export class SkillEditorComponent implements OnInit {
   readonly projectsStore = inject(ProjectsStore);
 
   showEditor = signal(false);
+  modalMode = signal<'create' | 'edit'>('create');
+  editingSkillId = signal<string | null>(null);
+  
+  // Sandbox state
+  testInput = signal('');
+  testResponse = signal('');
+  isTesting = signal(false);
   
   readonly skills = computed(() => this.skillsStore.skills());
   readonly projects = computed(() => this.projectsStore.projects());
+
+  // Menu state
+  readonly activeMenuId = signal<string | null>(null);
 
   skillForm = this.fb.group({
     name: ['', [Validators.required]],
@@ -34,23 +44,123 @@ export class SkillEditorComponent implements OnInit {
       this.skillsStore.loadSkills({ projectId: this.projects()[0].id });
       this.skillForm.patchValue({ projectId: this.projects()[0].id });
     }
+
+    window.addEventListener('click', () => this.activeMenuId.set(null));
   }
 
   openEditor() {
+    this.modalMode.set('create');
+    this.editingSkillId.set(null);
+    this.skillForm.reset({
+      modelName: 'gpt-4o',
+      temperature: 0.7,
+      projectId: this.projects()[0]?.id || ''
+    });
     this.showEditor.set(true);
+  }
+
+  openEditEditor(event: Event, skill: Skill) {
+    event.stopPropagation();
+    this.modalMode.set('edit');
+    this.editingSkillId.set(skill.id);
+    this.skillForm.patchValue({
+      name: skill.name,
+      description: skill.description || '',
+      systemPrompt: skill.systemPrompt,
+      modelName: skill.modelName,
+      temperature: skill.temperature,
+      projectId: skill.projectId
+    });
+    this.showEditor.set(true);
+    this.activeMenuId.set(null);
   }
 
   closeEditor() {
     this.showEditor.set(false);
-    this.skillForm.reset({
-      modelName: 'gpt-4o',
-      temperature: 0.7
-    });
+    this.editingSkillId.set(null);
+    this.testResponse.set('');
+    this.testInput.set('');
+  }
+
+  toggleMenu(event: Event, id: string) {
+    event.stopPropagation();
+    this.activeMenuId.set(this.activeMenuId() === id ? null : id);
+  }
+
+  deleteSkill(event: Event, id: string) {
+    event.stopPropagation();
+    if (confirm('Erase this skill from existence? This action is irreversible.')) {
+      this.skillsStore.deleteSkill(id);
+    }
+    this.activeMenuId.set(null);
+  }
+
+  async runTest() {
+    const userInput = this.testInput().trim();
+    const systemPrompt = this.skillForm.get('systemPrompt')?.value;
+
+    if (!userInput || !systemPrompt) return;
+
+    this.isTesting.set(true);
+    this.testResponse.set('');
+
+    try {
+      const response = await fetch('/api/v1/chat/stream', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'x-tenant-id': localStorage.getItem('tenant_id') || ''
+        },
+        body: JSON.stringify({
+          systemPrompt,
+          user_input: userInput
+        })
+      });
+
+      if (!response.ok) throw new Error('Sandbox link failed');
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      if (!reader) return;
+
+      let accumulated = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.substring(6));
+              if (data.content) {
+                accumulated += data.content;
+                this.testResponse.set(accumulated);
+              }
+            } catch (e) {}
+          }
+        }
+      }
+    } catch (err: any) {
+      this.testResponse.set('Error: ' + err.message);
+    } finally {
+      this.isTesting.set(false);
+    }
   }
 
   onSubmit() {
     if (this.skillForm.valid) {
-      this.skillsStore.createSkill(this.skillForm.value as any);
+      const data = this.skillForm.value;
+      const id = this.editingSkillId();
+      
+      if (this.modalMode() === 'create') {
+        this.skillsStore.createSkill(data as any);
+      } else if (id) {
+        this.skillsStore.updateSkill({ id, data: data as any });
+      }
+      
       this.closeEditor();
     }
   }

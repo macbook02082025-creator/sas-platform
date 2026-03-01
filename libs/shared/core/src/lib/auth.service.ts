@@ -2,16 +2,18 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 
+export interface Organization {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export interface User {
   id: string;
   email: string;
   firstName?: string;
   lastName?: string;
-  organization?: {
-    id: string;
-    name: string;
-    slug: string;
-  };
+  organizations?: Organization[];
 }
 
 export interface AuthResponse {

@@ -54,7 +54,33 @@
         </div>
         <div class="user-meta">
           <div class="user-name">{{user()?.firstName}} {{user()?.lastName}}</div>
-          <div class="user-plan">Admin · {{organization()?.name}}</div>
+          <div class="user-org-switcher" (click)="showOrgSwitcher.set(!showOrgSwitcher())">
+            <span class="org-name">{{currentOrganization()?.name}}</span>
+            <span class="material-symbols-rounded">unfold_more</span>
+            
+            @if (showOrgSwitcher()) {
+              <div class="org-dropdown" (click)="$event.stopPropagation()">
+                <div class="dropdown-header">Switch Organization</div>
+                @for (org of user()?.organizations; track org.id) {
+                  <div class="org-option" [class.active]="org.id === currentOrganization()?.id" (click)="switchOrganization(org.id)">
+                    <div class="org-icon">{{org.name[0]}}</div>
+                    <div class="org-info">
+                      <div class="org-label">{{org.name}}</div>
+                      <div class="org-role">Member</div>
+                    </div>
+                    @if (org.id === currentOrganization()?.id) {
+                      <span class="material-symbols-rounded check">check</span>
+                    }
+                  </div>
+                }
+                <div class="dropdown-divider"></div>
+                <div class="org-option create-org">
+                  <span class="material-symbols-rounded">add</span>
+                  <span>Create Organization</span>
+                </div>
+              </div>
+            }
+          </div>
         </div>
         <div class="online-badge"><div class="online-dot"></div>Live</div>
       </div>
@@ -116,14 +142,14 @@
   </main>
 </div>
 
-<!-- New Project Modal -->
+<!-- New/Edit Project Modal -->
 <div class="modal-overlay" [class.open]="dashboardService.showProjectModal()" (click)="dashboardService.closeModal()">
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-top">
       <div class="modal-header">
         <div>
-          <div class="modal-title">New Intelligence Unit</div>
-          <div class="modal-sub">Deploy a new AI unit connected to your vault network</div>
+          <div class="modal-title">{{dashboardService.modalMode() === 'create' ? 'New Intelligence Unit' : 'Modify Intelligence Unit'}}</div>
+          <div class="modal-sub">{{dashboardService.modalMode() === 'create' ? 'Deploy a new AI unit connected to your vault network' : 'Update the configuration of your active unit'}}</div>
         </div>
         <div class="modal-x" (click)="dashboardService.closeModal()">✕</div>
       </div>
@@ -131,16 +157,16 @@
     <div class="modal-body">
       <div class="form-grp">
         <label class="f-label">Project Name</label>
-        <input class="f-input" placeholder="my-unit-01" [ngModel]="dashboardService.newProjectName()" (ngModelChange)="dashboardService.newProjectName.set($event)" />
+        <input class="f-input" placeholder="my-unit-01" [ngModel]="dashboardService.projectName()" (ngModelChange)="dashboardService.projectName.set($event)" />
       </div>
       <div class="form-grp">
         <label class="f-label">Cognitive Description</label>
-        <textarea class="f-input" style="min-height: 80px; resize: none;" placeholder="What will this unit do?" [ngModel]="dashboardService.newProjectDescription()" (ngModelChange)="dashboardService.newProjectDescription.set($event)"></textarea>
+        <textarea class="f-input" style="min-height: 80px; resize: none;" placeholder="What will this unit do?" [ngModel]="dashboardService.projectDescription()" (ngModelChange)="dashboardService.projectDescription.set($event)"></textarea>
       </div>
     </div>
     <div class="modal-foot">
       <button class="ghost-btn" (click)="dashboardService.closeModal()">Cancel</button>
-      <button class="deploy-btn" (click)="createProject()">⚡ Deploy Unit</button>
+      <button class="deploy-btn" (click)="saveProject()">⚡ {{dashboardService.modalMode() === 'create' ? 'Deploy Unit' : 'Commit Changes'}}</button>
     </div>
   </div>
 </div>

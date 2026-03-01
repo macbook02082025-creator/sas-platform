@@ -33,4 +33,18 @@ export class SkillsController {
   findOne(@Req() req: any, @Param('id') id: string) {
     return this.skillsService.findOne(req.tenantId, id);
   }
+
+  @Post(':id')
+  update(
+    @Req() req: any,
+    @Param('id') id: string,
+    @Body() data: Partial<CreateSkillDto>
+  ) {
+    return this.skillsService.update(req.tenantId, id, data);
+  }
+
+  @Post(':id/delete')
+  delete(@Req() req: any, @Param('id') id: string) {
+    return this.skillsService.delete(req.tenantId, id);
+  }
 }

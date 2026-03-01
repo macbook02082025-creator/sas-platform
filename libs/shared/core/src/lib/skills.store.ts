@@ -66,6 +66,44 @@ export const SkillsStore = signalStore(
         )
       )
     ),
+    updateSkill: rxMethod<{ id: string; data: Partial<Skill> }>(
+      pipe(
+        tap(() => patchState(store, { isLoading: true })),
+        switchMap(({ id, data }) =>
+          http.post<Skill>(`/api/v1/skills/${id}`, data).pipe(
+            tap((updatedSkill) => 
+              patchState(store, { 
+                skills: store.skills().map(s => s.id === id ? updatedSkill : s), 
+                isLoading: false 
+              })
+            ),
+            catchError((err) => {
+              patchState(store, { isLoading: false, error: err.message });
+              return of(null);
+            })
+          )
+        )
+      )
+    ),
+    deleteSkill: rxMethod<string>(
+      pipe(
+        tap(() => patchState(store, { isLoading: true })),
+        switchMap((id) =>
+          http.post(`/api/v1/skills/${id}/delete`, {}).pipe(
+            tap(() => 
+              patchState(store, { 
+                skills: store.skills().filter(s => s.id !== id), 
+                isLoading: false 
+              })
+            ),
+            catchError((err) => {
+              patchState(store, { isLoading: false, error: err.message });
+              return of(null);
+            })
+          )
+        )
+      )
+    ),
     setCurrentSkill(skill: Skill | null) {
       patchState(store, { currentSkill: skill });
     }

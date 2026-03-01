@@ -1,7 +1,7 @@
 import { Component, inject, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ProjectsStore, ActivityStore, StatsStore } from '@sas-platform/shared-core';
+import { ProjectsStore, ActivityStore, StatsStore, Project } from '@sas-platform/shared-core';
 import { DashboardService } from './dashboard.service';
 
 @Component({
@@ -20,6 +20,9 @@ export default class OverviewComponent implements OnInit {
   readonly layout = signal<'grid' | 'list'>('grid');
   readonly barWidths = signal<{ [key: string]: string }>({});
   
+  // Menu state
+  readonly activeMenuId = signal<string | null>(null);
+  
   readonly projects = computed(() => this.projectsStore.projects());
   readonly activities = computed(() => this.activityStore.activities());
   readonly stats = computed(() => this.statsStore.stats());
@@ -37,6 +40,28 @@ export default class OverviewComponent implements OnInit {
         uptime: '99%'
       });
     }, 400);
+
+    // Global click listener to close menus
+    window.addEventListener('click', () => this.activeMenuId.set(null));
+  }
+
+  toggleMenu(event: Event, id: string) {
+    event.stopPropagation();
+    this.activeMenuId.set(this.activeMenuId() === id ? null : id);
+  }
+
+  editProject(event: Event, project: Project) {
+    event.stopPropagation();
+    this.dashboardService.openEditProjectModal(project);
+    this.activeMenuId.set(null);
+  }
+
+  deleteProject(event: Event, id: string) {
+    event.stopPropagation();
+    if (confirm('Decommission this unit? All neural links will be severed.')) {
+      this.projectsStore.deleteProject(id);
+    }
+    this.activeMenuId.set(null);
   }
 
   trackMouse(event: MouseEvent, card: HTMLElement) {

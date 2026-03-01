@@ -87,7 +87,20 @@
                [routerLink]="['/dashboard/chat', project.id]">
             <div class="uc-top">
               <div class="uc-icon" style="background:linear-gradient(135deg,#4f46e5,#7c3aed)">📁</div>
-              <div class="uc-menu" (click)="$event.stopPropagation()">⋯</div>
+              <div class="uc-menu-wrap" (click)="$event.stopPropagation()">
+                <div class="uc-menu" (click)="toggleMenu($event, project.id)">⋯</div>
+                @if (activeMenuId() === project.id) {
+                  <div class="action-dropdown">
+                    <div class="ad-item" (click)="editProject($event, project)">
+                      <span class="material-symbols-rounded">edit</span> Modify Configuration
+                    </div>
+                    <div class="ad-sep"></div>
+                    <div class="ad-item ad-danger" (click)="deleteProject($event, project.id)">
+                      <span class="material-symbols-rounded">delete</span> Decommission Unit
+                    </div>
+                  </div>
+                }
+              </div>
             </div>
             <div class="uc-name">{{project.name}}</div>
             <div class="uc-desc">{{project.description}}</div>
@@ -164,7 +177,20 @@
                 Active
               </div>
             </div>
-            <div class="li-actions">⋯</div>
+            <div class="li-actions-wrap" (click)="$event.stopPropagation()">
+              <div class="li-actions" (click)="toggleMenu($event, project.id)">⋯</div>
+              @if (activeMenuId() === project.id) {
+                <div class="action-dropdown ad-right">
+                  <div class="ad-item" (click)="editProject($event, project)">
+                    <span class="material-symbols-rounded">edit</span> Modify
+                  </div>
+                  <div class="ad-sep"></div>
+                  <div class="ad-item ad-danger" (click)="deleteProject($event, project.id)">
+                    <span class="material-symbols-rounded">delete</span> Decommission
+                  </div>
+                </div>
+              }
+            </div>
           </div>
         }
         <div class="list-item new-list-item" (click)="dashboardService.openNewProjectModal()">

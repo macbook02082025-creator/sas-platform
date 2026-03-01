@@ -61,11 +61,111 @@
 }
 
 .forge-textarea {
-  min-height: 320px;
+  min-height: 240px;
   font-family: 'Geist Mono', monospace;
   font-size: 13px;
   line-height: 1.6;
   resize: none;
+}
+
+.forge-sandbox {
+  margin-top: 12px;
+  background: rgba(124, 111, 255, 0.03);
+  border: 1px solid rgba(124, 111, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  animation: fadeIn 0.4s var(--ease);
+}
+
+.sandbox-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--v);
+  margin-bottom: 12px;
+  
+  .material-symbols-rounded { font-size: 16px; }
+}
+
+.sandbox-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.sandbox-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.2) !important;
+  font-size: 12px !important;
+}
+
+.test-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--v4);
+  border: 1px solid var(--v);
+  color: var(--v);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover:not(:disabled) {
+    background: var(--v);
+    color: white;
+    box-shadow: 0 0 15px var(--v4);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.sandbox-response {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(124, 111, 255, 0.1);
+}
+
+.sr-label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px;
+  color: var(--txt4);
+  margin-bottom: 8px;
+}
+
+.sr-content {
+  font-size: 13px;
+  color: var(--txt2);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.loader-dots {
+  display: flex;
+  gap: 3px;
+  
+  span {
+    width: 4px;
+    height: 4px;
+    background: currentColor;
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+    
+    &:nth-child(1) { animation-delay: -0.32s; }
+    &:nth-child(2) { animation-delay: -0.16s; }
+  }
+}
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
 }
 
 .forge-hint {
