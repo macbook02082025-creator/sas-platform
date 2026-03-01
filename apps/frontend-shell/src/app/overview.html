@@ -1,64 +1,5 @@
-<!-- STATS -->
-<div class="stats-grid">
-  <div class="stat-card">
-    <div class="stat-glow" style="background:#7c6fff"></div>
-    <div class="stat-top">
-      <div class="stat-icon-box" style="background:rgba(124,111,255,0.14)">🧠</div>
-      <div class="stat-chip chip-up">↑ {{stats()?.activeUnitsTrend || '0%'}}</div>
-    </div>
-    <div class="stat-num" style="background:linear-gradient(135deg,#c4baff,#7c6fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
-      {{stats()?.activeUnits || 0}}
-    </div>
-    <div class="stat-lbl">Active Units</div>
-    <div class="stat-bar-track"><div class="stat-bar-fill" [style.width]="barWidths()['active'] || '0%'" style="background:linear-gradient(90deg,#7c6fff,#a78bfa)"></div></div>
-    <svg class="stat-spark" viewBox="0 0 80 36" preserveAspectRatio="none"><polyline points="0,30 12,22 24,26 36,14 48,18 60,8 72,12 80,4" fill="none" stroke="#7c6fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </div>
-  
-  <div class="stat-card">
-    <div class="stat-glow" style="background:#22c55e"></div>
-    <div class="stat-top">
-      <div class="stat-icon-box" style="background:rgba(34,197,94,0.14)">🔬</div>
-      <div class="stat-chip chip-up">↑ {{stats()?.skillsTrend || '0 new'}}</div>
-    </div>
-    <div class="stat-num" style="background:linear-gradient(135deg,#86efac,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
-      {{stats()?.skillsDeployed || 0}}
-    </div>
-    <div class="stat-lbl">Skills Deployed</div>
-    <div class="stat-bar-track"><div class="stat-bar-fill" [style.width]="barWidths()['skills'] || '0%'" style="background:linear-gradient(90deg,#22c55e,#86efac)"></div></div>
-    <svg class="stat-spark" viewBox="0 0 80 36" preserveAspectRatio="none"><polyline points="0,32 12,28 24,24 36,20 48,15 60,10 72,8 80,4" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </div>
-
-  <div class="stat-card">
-    <div class="stat-glow" style="background:#06b6d4"></div>
-    <div class="stat-top">
-      <div class="stat-icon-box" style="background:rgba(6,182,212,0.14)">🗄️</div>
-      <div class="stat-chip chip-neu">{{stats()?.vaultsTrend || '0GB'}}</div>
-    </div>
-    <div class="stat-num" style="background:linear-gradient(135deg,#67e8f9,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
-      {{stats()?.dataVaults || 0}}
-    </div>
-    <div class="stat-lbl">Data Vaults</div>
-    <div class="stat-bar-track"><div class="stat-bar-fill" [style.width]="barWidths()['vaults'] || '0%'" style="background:linear-gradient(90deg,#06b6d4,#67e8f9)"></div></div>
-    <svg class="stat-spark" viewBox="0 0 80 36" preserveAspectRatio="none"><polyline points="0,28 12,30 24,22 36,24 48,16 60,18 72,10 80,6" fill="none" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </div>
-
-  <div class="stat-card">
-    <div class="stat-glow" style="background:#ec4899"></div>
-    <div class="stat-top">
-      <div class="stat-icon-box" style="background:rgba(236,72,153,0.14)">📡</div>
-      <div class="stat-chip chip-up">↑ {{stats()?.uptimeTrend || '0%'}}</div>
-    </div>
-    <div class="stat-num" style="background:linear-gradient(135deg,#f9a8d4,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
-      {{stats()?.uptimeScore || 0}}<span style="font-size:14px;font-weight:500">%</span>
-    </div>
-    <div class="stat-lbl">Uptime Score</div>
-    <div class="stat-bar-track"><div class="stat-bar-fill" [style.width]="barWidths()['uptime'] || '0%'" style="background:linear-gradient(90deg,#ec4899,#f9a8d4)"></div></div>
-    <svg class="stat-spark" viewBox="0 0 80 36" preserveAspectRatio="none"><polyline points="0,8 12,10 24,7 36,9 48,6 60,8 72,5 80,4" fill="none" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </div>
-</div>
-
 <!-- MID ROW -->
-<div class="mid-row" style="margin-top: 32px">
+<div class="mid-row">
   <!-- Units -->
   <div class="units-section">
     <div class="sec-header">
@@ -74,12 +15,21 @@
           <div class="seg-btn" [class.on]="layout() === 'list'" (click)="layout.set('list')">
             <span class="material-symbols-rounded">view_list</span>
           </div>
+          <div class="seg-btn" [class.on]="layout() === 'details'" (click)="layout.set('details')">
+            <span class="material-symbols-rounded">view_agenda</span>
+          </div>
         </div>
       </div>
     </div>
 
     @if (layout() === 'grid') {
       <div class="units-grid">
+        <div class="unit-card new-card" (click)="$event.stopPropagation(); dashboardService.openNewProjectModal()">
+          <div class="new-plus">+</div>
+          <div class="new-lbl">New Unit</div>
+          <div class="new-sub">Deploy intelligence</div>
+        </div>
+
         @for (project of projects(); track project.id) {
           <div class="unit-card" #card 
                (mousemove)="trackMouse($event, card)" 
@@ -137,14 +87,8 @@
             </svg>
           </div>
         }
-
-        <div class="unit-card new-card" (click)="dashboardService.openNewProjectModal()">
-          <div class="new-plus">+</div>
-          <div class="new-lbl">New Unit</div>
-          <div class="new-sub">Deploy intelligence</div>
-        </div>
       </div>
-    } @else {
+    } @else if (layout() === 'list') {
       <!-- List View -->
       <div class="units-list">
         @for (project of projects(); track project.id) {
@@ -197,6 +141,48 @@
           <div class="li-icon">+</div>
           <div class="li-title">Forge New Intelligence Unit</div>
         </div>
+      </div>
+    } @else {
+      <!-- DETAILS VIEW -->
+      <div class="details-list">
+        @for (project of projects(); track project.id) {
+          <div class="details-item" #di (mousemove)="trackMouse($event, di)" (mouseleave)="resetMouse(di)" [routerLink]="['/dashboard/chat', project.id]">
+            <div class="di-main">
+              <div class="di-top">
+                <div class="di-id-box">UNIT_HASH: {{project.id}}</div>
+                <div class="di-status-pill">
+                  <div class="pulse-dot dot-active"></div>
+                  LIVE_OPERATIONAL
+                </div>
+              </div>
+              <div class="di-name">{{project.name}}</div>
+              <div class="di-prompt-label">UNIT_DESCRIPTION_BLOCK:</div>
+              <div class="di-prompt-code">{{project.description}}</div>
+              <div class="di-meta-grid">
+                <div class="dm-item">
+                  <div class="dm-lbl">DEPLOYMENT_EPOCH</div>
+                  <div class="dm-val">{{project.createdAt}}</div>
+                </div>
+                <div class="dm-item">
+                  <div class="dm-lbl">INTELLIGENCE_LOAD</div>
+                  <div class="dm-val">{{project.load}}%</div>
+                </div>
+                <div class="dm-item">
+                  <div class="dm-lbl">CONNECTIVITY_STATUS</div>
+                  <div class="dm-val">ENCRYPTED_SSL</div>
+                </div>
+              </div>
+            </div>
+            <div class="di-side-actions" (click)="$event.stopPropagation()">
+               <button class="di-btn" (click)="editProject($event, project)">
+                 <span class="material-symbols-rounded">tune</span>
+               </button>
+               <button class="di-btn di-danger" (click)="deleteProject($event, project.id)">
+                 <span class="material-symbols-rounded">delete</span>
+               </button>
+            </div>
+          </div>
+        }
       </div>
     }
   </div>

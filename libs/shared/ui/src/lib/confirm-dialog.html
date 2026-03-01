@@ -1,0 +1,29 @@
+@if (confirmStore.isOpen()) {
+  <div class="confirm-overlay" (click)="confirmStore.cancel()">
+    <div class="confirm-modal" (click)="$event.stopPropagation()">
+      <div class="confirm-glow"></div>
+      
+      <div class="confirm-header">
+        <div class="confirm-icon-box" [class.danger]="confirmStore.danger()">
+          <span class="material-symbols-rounded">
+            {{ confirmStore.danger() ? 'warning' : 'info' }}
+          </span>
+        </div>
+        <div class="confirm-title">{{ confirmStore.title() }}</div>
+      </div>
+
+      <div class="confirm-body">
+        <p>{{ confirmStore.message() }}</p>
+      </div>
+
+      <div class="confirm-footer">
+        <button class="conf-btn cancel" (click)="confirmStore.cancel()">
+          {{ confirmStore.cancelLabel() }}
+        </button>
+        <button class="conf-btn confirm" [class.danger]="confirmStore.danger()" (click)="confirmStore.confirm()">
+          {{ confirmStore.confirmLabel() }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

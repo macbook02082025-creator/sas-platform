@@ -1,66 +1,179 @@
-<!-- SKILLS LAB HEADER -->
-<div class="sec-header" style="margin-bottom: 24px">
-  <div class="sec-title-group">
-    <span class="sec-title">Skills Synthesis</span>
-    <span class="sec-badge">{{skills().length}} deployed</span>
-  </div>
-  <div class="sec-actions">
-    <div class="filter-btn">⚙ Protocols</div>
-    <button class="new-btn" (click)="openEditor()">
-      <span>+</span> Forge Skill
-    </button>
-  </div>
-</div>
-
-<div class="skills-grid">
-  <!-- FORGE CARD -->
-  <div class="unit-card forge-zone" (click)="openEditor()">
-    <div class="new-plus">
-      <span class="material-symbols-rounded">psychology</span>
-    </div>
-    <div class="new-lbl">Forge New Skill</div>
-    <div class="new-sub">Define cognitive behaviors</div>
-  </div>
-
-  <!-- SKILL CARDS -->
-  @for (skill of skills(); track skill.id) {
-    <div class="unit-card" #card (mousemove)="trackMouse($event, card)" (mouseleave)="resetMouse(card)">
-      <div class="uc-top">
-        <div class="uc-icon" style="background: linear-gradient(135deg, var(--p), #be185d)">
-          <span class="material-symbols-rounded" style="font-size: 20px">bolt</span>
+<div class="mid-row">
+  <div class="units-section">
+    <!-- SKILLS LAB HEADER -->
+    <div class="sec-header">
+      <div class="sec-title-group">
+        <span class="sec-title">Skills Synthesis</span>
+        <span class="sec-badge">{{skills().length}} deployed</span>
+      </div>
+      <div class="sec-actions">
+        <div class="project-selector-wrap">
+          <span class="material-symbols-rounded">folder</span>
+          <select class="p-select" [value]="selectedProjectId() || 'all'" (change)="selectProject($event)">
+            <option value="all">All Intelligence Units</option>
+            @for (project of projects(); track project.id) {
+              <option [value]="project.id">{{project.name}}</option>
+            }
+          </select>
         </div>
-        <div class="uc-menu-wrap" (click)="$event.stopPropagation()">
-          <div class="uc-menu" (click)="toggleMenu($event, skill.id)">⋯</div>
-          @if (activeMenuId() === skill.id) {
-            <div class="action-dropdown">
-              <div class="ad-item" (click)="openEditEditor($event, skill)">
-                <span class="material-symbols-rounded">edit</span> Modify Core
+
+        <div class="seg-ctrl">
+          <div class="seg-btn" [class.on]="layout() === 'grid'" (click)="layout.set('grid')">
+            <span class="material-symbols-rounded">grid_view</span>
+          </div>
+          <div class="seg-btn" [class.on]="layout() === 'list'" (click)="layout.set('list')">
+            <span class="material-symbols-rounded">view_list</span>
+          </div>
+          <div class="seg-btn" [class.on]="layout() === 'details'" (click)="layout.set('details')">
+            <span class="material-symbols-rounded">view_agenda</span>
+          </div>
+        </div>
+
+        <div class="filter-btn">⚙ Protocols</div>
+        <button class="new-btn" (click)="openEditor()">
+          <span>+</span> Forge Skill
+        </button>
+      </div>
+    </div>
+
+    @if (layout() === 'grid') {
+      <div class="units-grid">
+        <!-- FORGE CARD -->
+        <div class="unit-card forge-zone" (click)="openEditor()">
+          <div class="new-plus">
+            <span class="material-symbols-rounded">psychology</span>
+          </div>
+          <div class="new-lbl">Forge New Skill</div>
+          <div class="new-sub">Define cognitive behaviors</div>
+        </div>
+
+        <!-- SKILL CARDS -->
+        @for (skill of skills(); track skill.id) {
+          <div class="unit-card" #card (mousemove)="trackMouse($event, card)" (mouseleave)="resetMouse(card)">
+            <div class="uc-top">
+              <div class="uc-icon" style="background: linear-gradient(135deg, var(--p), #be185d)">
+                <span class="material-symbols-rounded" style="font-size: 20px">bolt</span>
               </div>
-              <div class="ad-sep"></div>
-              <div class="ad-item ad-danger" (click)="deleteSkill($event, skill.id)">
-                <span class="material-symbols-rounded">delete</span> Erase Skill
+              <div class="uc-menu-wrap" (click)="$event.stopPropagation()">
+                <div class="uc-menu" (click)="toggleMenu($event, skill.id)">⋯</div>
+                @if (activeMenuId() === skill.id) {
+                  <div class="action-dropdown">
+                    <div class="ad-item" (click)="openEditEditor($event, skill)">
+                      <span class="material-symbols-rounded">edit</span> Modify Core
+                    </div>
+                    <div class="ad-sep"></div>
+                    <div class="ad-item ad-danger" (click)="deleteSkill($event, skill.id)">
+                      <span class="material-symbols-rounded">delete</span> Erase Skill
+                    </div>
+                  </div>
+                }
               </div>
             </div>
-          }
-        </div>
-      </div>
-      <div class="uc-name">{{skill.name}}</div>
-      <div class="uc-desc">{{skill.description || 'Cognitive logic core initialized. Ready for neural processing.'}}</div>
-      
-      <div class="uc-tags">
-        <span class="uc-tag">{{skill.modelName}}</span>
-        <span class="uc-tag">T: {{skill.temperature}}</span>
-      </div>
+            <div class="uc-name">{{skill.name}}</div>
+            <div class="uc-desc">{{skill.description || 'Cognitive logic core initialized. Ready for neural processing.'}}</div>
+            
+            <div class="uc-tags">
+              <span class="uc-tag">{{skill.modelName}}</span>
+              <span class="uc-tag">T: {{skill.temperature}}</span>
+            </div>
 
-      <div class="uc-footer">
-        <div class="uc-status">
-          <div class="pulse-dot dot-active" style="background: var(--p)"></div>
-          <span style="color: var(--p)">Operational</span>
-        </div>
-        <div class="uc-id">Created: {{formatTime(skill.createdAt)}}</div>
+            <div class="uc-footer">
+              <div class="uc-status">
+                <div class="pulse-dot dot-active" style="background: var(--p)"></div>
+                <span style="color: var(--p)">Operational</span>
+              </div>
+              <div class="uc-id">Created: {{formatTime(skill.createdAt)}}</div>
+            </div>
+          </div>
+        }
       </div>
-    </div>
-  }
+    } @else if (layout() === 'list') {
+      <div class="units-list">
+        @for (skill of skills(); track skill.id) {
+          <div class="list-item" #li (mousemove)="trackMouse($event, li)" (mouseleave)="resetMouse(li)">
+            <div class="li-icon" style="background: var(--p); color: white">⚡</div>
+            <div class="li-content">
+              <div class="li-header">
+                <div class="li-title">{{skill.name}}</div>
+                <div class="li-tags">
+                  <span class="uc-tag">{{skill.modelName}}</span>
+                  <span class="uc-tag">T: {{skill.temperature}}</span>
+                </div>
+              </div>
+              <div class="li-desc">{{skill.description}}</div>
+            </div>
+            <div class="li-meta">
+              <div class="li-time">{{formatTime(skill.createdAt)}}</div>
+              <div class="li-status">
+                <div class="pulse-dot dot-active" style="background: var(--p)"></div>
+                Active
+              </div>
+            </div>
+            <div class="li-actions-wrap" (click)="$event.stopPropagation()">
+              <div class="li-actions" (click)="toggleMenu($event, skill.id)">⋯</div>
+              @if (activeMenuId() === skill.id) {
+                <div class="action-dropdown ad-right">
+                  <div class="ad-item" (click)="openEditEditor($event, skill)">
+                    <span class="material-symbols-rounded">edit</span> Modify
+                  </div>
+                  <div class="ad-sep"></div>
+                  <div class="ad-item ad-danger" (click)="deleteSkill($event, skill.id)">
+                    <span class="material-symbols-rounded">delete</span> Erase
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+        <div class="list-item new-list-item" (click)="openEditor()">
+          <div class="li-icon" style="color: var(--p)">+</div>
+          <div class="li-title">Forge New Cognitive Skill</div>
+        </div>
+      </div>
+    } @else {
+      <!-- DETAILS VIEW -->
+      <div class="details-list">
+        @for (skill of skills(); track skill.id) {
+          <div class="details-item" #di (mousemove)="trackMouse($event, di)" (mouseleave)="resetMouse(di)">
+            <div class="di-main">
+              <div class="di-top">
+                <div class="di-id-box">SKILL_HASH: {{skill.id}}</div>
+                <div class="di-status-pill">
+                  <div class="pulse-dot dot-active"></div>
+                  LIVE_PROD
+                </div>
+              </div>
+              <div class="di-name">{{skill.name}}</div>
+              <div class="di-prompt-label">SYSTEM_DIRECTIVE_BLOCK:</div>
+              <div class="di-prompt-code">{{skill.systemPrompt}}</div>
+              <div class="di-meta-grid">
+                <div class="dm-item">
+                  <div class="dm-lbl">DEPLOYMENT_STAMP</div>
+                  <div class="dm-val">{{skill.createdAt}}</div>
+                </div>
+                <div class="dm-item">
+                  <div class="dm-lbl">ENTROPY_COEFFICIENT</div>
+                  <div class="dm-val">{{skill.temperature}}</div>
+                </div>
+                <div class="dm-item">
+                  <div class="dm-lbl">BEHAVIOR_INTEGRITY</div>
+                  <div class="dm-val">VERIFIED_99.8%</div>
+                </div>
+              </div>
+            </div>
+            <div class="di-side-actions">
+               <button class="di-btn" (click)="openEditEditor($event, skill)">
+                 <span class="material-symbols-rounded">tune</span>
+               </button>
+               <button class="di-btn di-danger" (click)="deleteSkill($event, skill.id)">
+                 <span class="material-symbols-rounded">delete</span>
+               </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
 </div>
 
 <!-- FORGE MODAL (SLIDE-OVER) -->

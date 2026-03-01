@@ -1,7 +1,7 @@
 import { Component, inject, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ProjectsStore, ActivityStore, StatsStore, Project } from '@sas-platform/shared-core';
+import { ProjectsStore, ActivityStore, StatsStore, Project, ConfirmStore } from '@sas-platform/shared-core';
 import { DashboardService } from './dashboard.service';
 
 @Component({
@@ -14,33 +14,20 @@ import { DashboardService } from './dashboard.service';
 export default class OverviewComponent implements OnInit {
   readonly projectsStore = inject(ProjectsStore);
   readonly activityStore = inject(ActivityStore);
-  readonly statsStore = inject(StatsStore);
   readonly dashboardService = inject(DashboardService);
+  readonly confirmStore = inject(ConfirmStore);
   
-  readonly layout = signal<'grid' | 'list'>('grid');
-  readonly barWidths = signal<{ [key: string]: string }>({});
+  readonly layout = signal<'grid' | 'list' | 'details'>('grid');
   
   // Menu state
   readonly activeMenuId = signal<string | null>(null);
   
   readonly projects = computed(() => this.projectsStore.projects());
   readonly activities = computed(() => this.activityStore.activities());
-  readonly stats = computed(() => this.statsStore.stats());
 
   ngOnInit() {
     this.activityStore.loadActivities();
-    this.statsStore.loadStats();
     
-    // Trigger bar animations
-    setTimeout(() => {
-      this.barWidths.set({
-        active: '75%',
-        skills: '62%',
-        vaults: '88%',
-        uptime: '99%'
-      });
-    }, 400);
-
     // Global click listener to close menus
     window.addEventListener('click', () => this.activeMenuId.set(null));
   }
@@ -56,9 +43,17 @@ export default class OverviewComponent implements OnInit {
     this.activeMenuId.set(null);
   }
 
-  deleteProject(event: Event, id: string) {
+  async deleteProject(event: Event, id: string) {
     event.stopPropagation();
-    if (confirm('Decommission this unit? All neural links will be severed.')) {
+    
+    const confirmed = await this.confirmStore.ask({
+      title: 'Decommission Unit',
+      message: 'Decommission this unit? All neural links will be severed.',
+      confirmLabel: 'Decommission',
+      danger: true
+    });
+
+    if (confirmed) {
       this.projectsStore.deleteProject(id);
     }
     this.activeMenuId.set(null);

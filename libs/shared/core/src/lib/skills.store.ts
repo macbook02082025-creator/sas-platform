@@ -33,18 +33,21 @@ export const SkillsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withMethods((store, http = inject(HttpClient)) => ({
-    loadSkills: rxMethod<{ projectId: string }>(
+    loadSkills: rxMethod<{ projectId?: string } | void>(
       pipe(
         tap(() => patchState(store, { isLoading: true })),
-        switchMap(({ projectId }) =>
-          http.get<Skill[]>(`/api/v1/skills?projectId=${projectId}`).pipe(
+        switchMap((arg) => {
+          const projectId = arg && typeof arg === 'object' ? arg.projectId : undefined;
+          const url = projectId ? `/api/v1/skills?projectId=${projectId}` : '/api/v1/skills';
+          
+          return http.get<Skill[]>(url).pipe(
             tap((skills) => patchState(store, { skills, isLoading: false })),
             catchError((err) => {
               patchState(store, { isLoading: false, error: err.message });
               return of([]);
             })
-          )
-        )
+          );
+        })
       )
     ),
     createSkill: rxMethod<Partial<Skill>>(

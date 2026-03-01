@@ -1,7 +1,7 @@
-import { Component, inject, computed, OnInit, signal } from '@angular/core';
+import { Component, inject, computed, OnInit, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { SkillsStore, ProjectsStore, Skill } from '@sas-platform/shared-core';
+import { SkillsStore, ProjectsStore, Skill, ConfirmStore } from '@sas-platform/shared-core';
 
 @Component({
   selector: 'app-skill-editor',
@@ -14,6 +14,9 @@ export class SkillEditorComponent implements OnInit {
   private fb = inject(FormBuilder);
   readonly skillsStore = inject(SkillsStore);
   readonly projectsStore = inject(ProjectsStore);
+  readonly confirmStore = inject(ConfirmStore);
+
+  selectedProjectId = signal<string | null>(null);
 
   showEditor = signal(false);
   modalMode = signal<'create' | 'edit'>('create');
@@ -23,6 +26,8 @@ export class SkillEditorComponent implements OnInit {
   testInput = signal('');
   testResponse = signal('');
   isTesting = signal(false);
+  
+  readonly layout = signal<'grid' | 'list' | 'details'>('grid');
   
   readonly skills = computed(() => this.skillsStore.skills());
   readonly projects = computed(() => this.projectsStore.projects());
@@ -39,13 +44,31 @@ export class SkillEditorComponent implements OnInit {
     projectId: ['', [Validators.required]]
   });
 
-  ngOnInit() {
-    if (this.projects().length > 0) {
-      this.skillsStore.loadSkills({ projectId: this.projects()[0].id });
-      this.skillForm.patchValue({ projectId: this.projects()[0].id });
-    }
+  constructor() {
+    effect(() => {
+      const id = this.selectedProjectId();
+      if (id) {
+        this.skillsStore.loadSkills({ projectId: id });
+        if (this.modalMode() === 'create') {
+          this.skillForm.patchValue({ projectId: id });
+        }
+      } else {
+        // Fetch ENTIRE LIST for organization
+        this.skillsStore.loadSkills();
+      }
+    });
 
+    // Default to 'All' (null) initially
+    this.selectedProjectId.set(null);
+  }
+
+  ngOnInit() {
     window.addEventListener('click', () => this.activeMenuId.set(null));
+  }
+
+  selectProject(event: Event) {
+    const val = (event.target as HTMLSelectElement).value;
+    this.selectedProjectId.set(val === 'all' ? null : val);
   }
 
   openEditor() {
@@ -54,7 +77,7 @@ export class SkillEditorComponent implements OnInit {
     this.skillForm.reset({
       modelName: 'gpt-4o',
       temperature: 0.7,
-      projectId: this.projects()[0]?.id || ''
+      projectId: this.selectedProjectId() || this.projects()[0]?.id || ''
     });
     this.showEditor.set(true);
   }
@@ -87,9 +110,17 @@ export class SkillEditorComponent implements OnInit {
     this.activeMenuId.set(this.activeMenuId() === id ? null : id);
   }
 
-  deleteSkill(event: Event, id: string) {
+  async deleteSkill(event: Event, id: string) {
     event.stopPropagation();
-    if (confirm('Erase this skill from existence? This action is irreversible.')) {
+    
+    const confirmed = await this.confirmStore.ask({
+      title: 'Erase Skill',
+      message: 'Are you sure you want to erase this skill from existence? This action is irreversible.',
+      confirmLabel: 'Erase Skill',
+      danger: true
+    });
+
+    if (confirmed) {
       this.skillsStore.deleteSkill(id);
     }
     this.activeMenuId.set(null);
@@ -152,13 +183,22 @@ export class SkillEditorComponent implements OnInit {
 
   onSubmit() {
     if (this.skillForm.valid) {
-      const data = this.skillForm.value;
+      const formValue = this.skillForm.getRawValue();
       const id = this.editingSkillId();
       
+      const skillData = {
+        name: formValue.name!,
+        description: formValue.description || '',
+        systemPrompt: formValue.systemPrompt!,
+        modelName: formValue.modelName!,
+        temperature: formValue.temperature!,
+        projectId: formValue.projectId!
+      };
+      
       if (this.modalMode() === 'create') {
-        this.skillsStore.createSkill(data as any);
+        this.skillsStore.createSkill(skillData);
       } else if (id) {
-        this.skillsStore.updateSkill({ id, data: data as any });
+        this.skillsStore.updateSkill({ id, data: skillData });
       }
       
       this.closeEditor();

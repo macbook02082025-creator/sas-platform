@@ -1,7 +1,40 @@
-.skills-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+.project-selector-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  padding: 0 12px;
+  border-radius: 10px;
+  height: 40px;
+  color: var(--txt3);
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: var(--v);
+    background: var(--glass2);
+  }
+
+  .material-symbols-rounded {
+    font-size: 18px;
+    color: var(--v);
+  }
+
+  .p-select {
+    background: transparent;
+    border: none;
+    color: var(--txt);
+    font-size: 13px;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    padding-right: 8px;
+
+    option {
+      background: var(--bg);
+      color: var(--txt);
+    }
+  }
 }
 
 .forge-zone {
