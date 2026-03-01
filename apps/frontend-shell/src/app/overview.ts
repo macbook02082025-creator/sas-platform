@@ -17,6 +17,7 @@ export default class OverviewComponent implements OnInit {
   readonly dashboardService = inject(DashboardService);
   
   readonly layout = signal<'grid' | 'list'>('grid');
+  readonly barWidths = signal<{ [key: string]: string }>({});
   
   readonly projects = computed(() => this.projectsStore.projects());
   readonly activities = computed(() => this.activityStore.activities());
@@ -25,6 +26,16 @@ export default class OverviewComponent implements OnInit {
   ngOnInit() {
     this.activityStore.loadActivities();
     this.statsStore.loadStats();
+    
+    // Trigger bar animations
+    setTimeout(() => {
+      this.barWidths.set({
+        active: '75%',
+        skills: '62%',
+        vaults: '88%',
+        uptime: '99%'
+      });
+    }, 400);
   }
 
   trackMouse(event: MouseEvent, card: HTMLElement) {

@@ -6,9 +6,11 @@
       <div class="stat-icon-box" style="background:rgba(124,111,255,0.14)">🧠</div>
       <div class="stat-chip chip-up">↑ {{stats()?.activeUnitsTrend || '0%'}}</div>
     </div>
-    <div class="stat-num" [style.background]="'linear-gradient(135deg,#c4baff,#7c6fff)'" style="-webkit-background-clip:text;-webkit-text-fill-color:transparent">{{stats()?.activeUnits || 0}}</div>
+    <div class="stat-num" style="background:linear-gradient(135deg,#c4baff,#7c6fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
+      {{stats()?.activeUnits || 0}}
+    </div>
     <div class="stat-lbl">Active Units</div>
-    <div class="stat-bar-track"><div class="stat-bar-fill" style="width:75%;background:linear-gradient(90deg,#7c6fff,#a78bfa)"></div></div>
+    <div class="stat-bar-track"><div class="stat-bar-fill" [style.width]="barWidths()['active'] || '0%'" style="background:linear-gradient(90deg,#7c6fff,#a78bfa)"></div></div>
     <svg class="stat-spark" viewBox="0 0 80 36" preserveAspectRatio="none"><polyline points="0,30 12,22 24,26 36,14 48,18 60,8 72,12 80,4" fill="none" stroke="#7c6fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
   
@@ -18,9 +20,11 @@
       <div class="stat-icon-box" style="background:rgba(34,197,94,0.14)">🔬</div>
       <div class="stat-chip chip-up">↑ {{stats()?.skillsTrend || '0 new'}}</div>
     </div>
-    <div class="stat-num" [style.background]="'linear-gradient(135deg,#86efac,#22c55e)'" style="-webkit-background-clip:text;-webkit-text-fill-color:transparent">{{stats()?.skillsDeployed || 0}}</div>
+    <div class="stat-num" style="background:linear-gradient(135deg,#86efac,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
+      {{stats()?.skillsDeployed || 0}}
+    </div>
     <div class="stat-lbl">Skills Deployed</div>
-    <div class="stat-bar-track"><div class="stat-bar-fill" style="width:62%;background:linear-gradient(90deg,#22c55e,#86efac)"></div></div>
+    <div class="stat-bar-track"><div class="stat-bar-fill" [style.width]="barWidths()['skills'] || '0%'" style="background:linear-gradient(90deg,#22c55e,#86efac)"></div></div>
     <svg class="stat-spark" viewBox="0 0 80 36" preserveAspectRatio="none"><polyline points="0,32 12,28 24,24 36,20 48,15 60,10 72,8 80,4" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
 
@@ -30,9 +34,11 @@
       <div class="stat-icon-box" style="background:rgba(6,182,212,0.14)">🗄️</div>
       <div class="stat-chip chip-neu">{{stats()?.vaultsTrend || '0GB'}}</div>
     </div>
-    <div class="stat-num" [style.background]="'linear-gradient(135deg,#67e8f9,#06b6d4)'" style="-webkit-background-clip:text;-webkit-text-fill-color:transparent">{{stats()?.dataVaults || 0}}</div>
+    <div class="stat-num" style="background:linear-gradient(135deg,#67e8f9,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
+      {{stats()?.dataVaults || 0}}
+    </div>
     <div class="stat-lbl">Data Vaults</div>
-    <div class="stat-bar-track"><div class="stat-bar-fill" style="width:88%;background:linear-gradient(90deg,#06b6d4,#67e8f9)"></div></div>
+    <div class="stat-bar-track"><div class="stat-bar-fill" [style.width]="barWidths()['vaults'] || '0%'" style="background:linear-gradient(90deg,#06b6d4,#67e8f9)"></div></div>
     <svg class="stat-spark" viewBox="0 0 80 36" preserveAspectRatio="none"><polyline points="0,28 12,30 24,22 36,24 48,16 60,18 72,10 80,6" fill="none" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
 
@@ -42,15 +48,17 @@
       <div class="stat-icon-box" style="background:rgba(236,72,153,0.14)">📡</div>
       <div class="stat-chip chip-up">↑ {{stats()?.uptimeTrend || '0%'}}</div>
     </div>
-    <div class="stat-num" [style.background]="'linear-gradient(135deg,#f9a8d4,#ec4899)'" style="-webkit-background-clip:text;-webkit-text-fill-color:transparent">{{stats()?.uptimeScore || 0}}<span style="font-size:14px;font-weight:500">%</span></div>
+    <div class="stat-num" style="background:linear-gradient(135deg,#f9a8d4,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
+      {{stats()?.uptimeScore || 0}}<span style="font-size:14px;font-weight:500">%</span>
+    </div>
     <div class="stat-lbl">Uptime Score</div>
-    <div class="stat-bar-track"><div class="stat-bar-fill" style="width:99%;background:linear-gradient(90deg,#ec4899,#f9a8d4)"></div></div>
+    <div class="stat-bar-track"><div class="stat-bar-fill" [style.width]="barWidths()['uptime'] || '0%'" style="background:linear-gradient(90deg,#ec4899,#f9a8d4)"></div></div>
     <svg class="stat-spark" viewBox="0 0 80 36" preserveAspectRatio="none"><polyline points="0,8 12,10 24,7 36,9 48,6 60,8 72,5 80,4" fill="none" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
 </div>
 
 <!-- MID ROW -->
-<div class="mid-row">
+<div class="mid-row" style="margin-top: 32px">
   <!-- Units -->
   <div class="units-section">
     <div class="sec-header">
@@ -108,6 +116,9 @@
                 }
               </div>
             </div>
+            <svg class="sparkline" viewBox="0 0 90 40" preserveAspectRatio="none">
+              <polyline points="0,35 15,28 30,30 45,18 60,22 75,10 90,14" fill="none" stroke="#22c55e" stroke-width="1.2"/>
+            </svg>
           </div>
         }
 

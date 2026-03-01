@@ -1,3 +1,9 @@
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
 /* MID ROW */
 .mid-row {
   display: block;
@@ -16,18 +22,18 @@
 }
 
 .new-card {
-  border-style: dashed;
-  border-color: rgba(124, 111, 255, 0.2);
+  border-style: dashed !important;
+  border-color: rgba(124, 111, 255, 0.2) !important;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 10px;
   min-height: 200px;
-  background: radial-gradient(circle at 50% 50%, rgba(124, 111, 255, 0.04), transparent);
+  background: radial-gradient(circle at 50% 50%, rgba(124, 111, 255, 0.04), transparent) !important;
   
   &:hover {
-    border-color: rgba(124, 111, 255, 0.4);
+    border-color: rgba(124, 111, 255, 0.4) !important;
     transform: translateY(-3px);
   }
 }
@@ -137,11 +143,7 @@
 
 .li-status {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  color: var(--g);
+  align-items: center; gap: 6px; font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--g);
 }
 
 .li-actions {
@@ -164,37 +166,6 @@
   .li-icon {
     border-style: dashed;
     color: var(--p);
-  }
-}
-
-/* Segment Control */
-.seg-ctrl {
-  display: flex;
-  background: var(--glass);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 2px;
-}
-
-.seg-btn {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border-radius: 8px;
-  color: var(--txt3);
-  transition: all 0.15s;
-  
-  .material-symbols-rounded { font-size: 18px; }
-  
-  &:hover { color: var(--txt2); background: var(--glass); }
-  
-  &.on {
-    background: var(--glass2);
-    color: var(--v);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   }
 }
 
