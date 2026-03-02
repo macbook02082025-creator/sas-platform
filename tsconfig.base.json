@@ -21,7 +21,8 @@
     "paths": {
       "mfeAuth/Routes": ["apps/mfe-auth/src/app/remote-entry/entry.routes.ts"],
       "@sas-platform/shared-ui": ["libs/shared/ui/src/index.ts"],
-      "@sas-platform/shared-core": ["libs/shared/core/src/index.ts"]
+      "@sas-platform/shared-core": ["libs/shared/core/src/index.ts"],
+      "@sas-platform/shared-dto": ["libs/shared/dto/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

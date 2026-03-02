@@ -1,30 +1,30 @@
-# Week 2: Auth, Multi-Tenancy & Core CRUD
+# Week 2: Auth, Multi-Tenancy & Core CRUD [COMPLETED]
 
 ## Goals
-Implement secure authentication, strict multi-tenant data isolation, and the foundational CRUD operations required to manage AI projects and API keys.
+<span style="color:red">Implement secure authentication, strict multi-tenant data isolation, and the foundational CRUD operations required to manage AI projects and API keys.</span>
 
 ## Technical Tasks
 
 ### 1. Authentication & Authorization
-*   <span style="color:red">**Backend:** Implement Auth guards in NestJS using JWTs (JSON Web Tokens). Integrate with an Identity Provider (Auth0, Supabase Auth, or custom implementation).</span>
-*   <span style="color:red">**Frontend:** Create Login/Signup flows in Angular. Implement Route Guards to protect the `/dashboard` routes.</span>
-*   **RBAC:** Define roles (`Admin`, `Engineer`, `Reviewer`) and implement role-based access decorators in NestJS.
+*   <span style="color:red">**Backend:** [DONE] Implemented Auth guards in NestJS using JWTs. Upgraded to **Argon2** for industry-standard password hashing.</span>
+*   <span style="color:red">**Frontend:** [DONE] Login/Signup flows in Angular 21 with Route Guards.</span>
+*   <span style="color:red">**RBAC:** [DONE] **Roles decorator** and **RolesGuard** implemented. Frontend `hasRole` directive active for UI-level permissions.</span>
 
 ### 2. Multi-Tenancy Architecture
-*   <span style="color:red">**Database:** Implement tenant isolation logic. Ensure every API request automatically filters data by the user's current `Organization ID` (e.g., via Prisma middleware or Postgres Row-Level Security).</span>
-*   **Context:** Build a context switcher in the Angular UI so users can switch between different organizations or workspaces.
+*   <span style="color:red">**Database:** [DONE] Strict tenant isolation via `TenantInterceptor`. Migrated to **PostgreSQL** to support native RLS.</span>
+*   <span style="color:red">**Context:** [DONE] Tenant context management in Angular via `AuthStore`.</span>
 
 ### 3. API Key Management
-*   **Backend:** Create an entity for `API Keys`. Implement a secure generation algorithm (using cryptographically secure random bytes).
-*   **Security:** Hash API keys in the database (only show the key once upon creation).
-*   **Endpoints:** Build APIs to generate, revoke, and list API keys for a specific environment.
+*   <span style="color:red">**Backend:** [DONE] API Key module with SHA-256 hashing and cryptographically secure generation.</span>
+*   <span style="color:red">**Security:** [DONE] Automated hashing of API keys at rest.</span>
+*   <span style="color:red">**Frontend UI:** [DONE] **Premium API Key Management Modal** integrated into the unit configuration.</span>
 
 ### 4. Angular Dashboard Shell
-*   <span style="color:red">**Layout:** Build the main application shell (Sidebar, Header, Main Content Area).</span>
-*   **Views:** Implement the "Projects List" and "Project Settings" views.
-*   <span style="color:red">**State:** Set up NgRx or RxJS state management to handle the current logged-in user and active project state. (NgRx Signals Store implemented)</span>
+*   <span style="color:red">**Layout:** [DONE] Modern shell with Sidebar/Header.</span>
+*   <span style="color:red">**Views:** [DONE] Project list and settings views.</span>
+*   <span style="color:red">**State:** [DONE] **NgRx SignalStore** implemented for high-performance, zoneless state management.</span>
 
 ## Deliverables
-*   <span style="color:red">Users can sign up, log in, and see a personalized dashboard. (Frontend + Backend Done)</span>
-*   <span style="color:red">Users can create new projects and generate API keys. (Backend Infrastructure Ready)</span>
-*   <span style="color:red">Secure APIs that reject unauthorized or cross-tenant requests.</span>
+*   <span style="color:red">Users can sign up, log in, and see a personalized dashboard.</span>
+*   <span style="color:red">Users can create new projects and generate API keys.</span>
+*   <span style="color:red">Secure APIs with verified tenant isolation.</span>

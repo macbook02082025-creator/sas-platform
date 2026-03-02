@@ -44,6 +44,9 @@
                     <div class="ad-item" (click)="editProject($event, project)">
                       <span class="material-symbols-rounded">edit</span> Modify Configuration
                     </div>
+                    <div class="ad-item" (click)="manageApiKeys($event, project.id)">
+                      <span class="material-symbols-rounded">key</span> Manage API Keys
+                    </div>
                     <div class="ad-sep"></div>
                     <div class="ad-item ad-danger" (click)="deleteProject($event, project.id)">
                       <span class="material-symbols-rounded">delete</span> Decommission Unit

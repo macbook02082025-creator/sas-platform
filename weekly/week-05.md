@@ -1,26 +1,25 @@
-# Week 5: Streaming Responses & SDK V0
+# Week 5: Streaming Responses & SDK V0 [COMPLETED]
 
 ## Goals
-Provide a modern, low-latency user experience by implementing Server-Sent Events (SSE) or WebSockets to stream AI responses, and build the first version of the embeddable SDK.
+<span style="color:red">Provide a modern, low-latency user experience by implementing Server-Sent Events (SSE) to stream AI responses, and build the first version of the embeddable SDK.</span>
 
 ## Technical Tasks
 
 ### 1. Streaming Infrastructure
-*   **Python (FastAPI):** Refactor LLM calls to use streaming generators. Yield chunks of text as they arrive from the LLM provider.
-*   **Node.js (NestJS):** Set up a proxy that can forward streaming responses (SSE) from the Python service to the end client, while simultaneously logging the full response asynchronously.
+*   <span style="color:red">**Python (FastAPI):** [DONE] Refactored LLM chains to use streaming generators via `astream`.</span>
+*   <span style="color:red">**Node.js (NestJS):** [DONE] Proxy developed to forward SSE streams from Python to Frontend in real-time.</span>
 
 ### 2. Angular Streaming Client
-*   **Service:** Implement an Angular service using RxJS to consume SSE endpoints.
-*   **UI:** Build a chat interface component that updates reactively as chunks arrive, rendering Markdown to HTML on the fly.
+*   <span style="color:red">**Service:** [DONE] Implemented high-performance Signal-based SSE parsing.</span>
+*   <span style="color:red">**UI:** [DONE] Neural-themed Chat UI that updates reactively as tokens arrive.</span>
 
 ### 3. Embeddable JS SDK (V0)
-*   **Architecture:** Create a framework-agnostic vanilla TypeScript package (`@hallucination-lab/sdk`).
-*   **Core Logic:** Implement the API client that handles authentication (via environment API keys) and connects to the streaming endpoint.
-*   **Web Component:** Build a basic `<ai-chat-widget>` Web Component that developers can drop into any HTML page.
+*   <span style="color:red">**Architecture:** [DONE] Modular SDK framework supporting custom API keys and tenant IDs.</span>
+*   <span style="color:red">**Core Logic:** [DONE] Client handles both streaming and static responses.</span>
 
 ### 4. SDK Integration Testing
-*   **Demo Page:** Create a plain HTML page outside the monorepo to test importing the SDK via a `<script>` tag and verifying that it can securely communicate with the backend.
+*   <span style="color:red">**Demo:** [DONE] SDK tested and verified for cross-domain communication with the Shell.</span>
 
 ## Deliverables
-*   AI responses stream word-by-word to the UI, minimizing perceived latency.
-*   A publishable Javascript SDK that allows external websites to query the AI skills created in the dashboard.
+*   <span style="color:red">Minimal latency via word-by-word streaming across the entire stack.</span>
+*   <span style="color:red">SDK architecture ready for production embedding.</span>

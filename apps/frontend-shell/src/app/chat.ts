@@ -4,12 +4,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ProjectsStore, SkillsStore, AuthStore } from '@sas-platform/shared-core';
 
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-  isStreaming?: boolean;
-}
+import { Message } from '@sas-platform/shared-dto';
 
 @Component({
   selector: 'app-chat',
@@ -148,7 +143,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       });
 
     } catch (error: any) {
-      console.error('Chat Error:', error);
+      // In a real app, send to an observability platform like LangSmith or DataDog
       this.isThinking.set(false);
       this.messages.update(msgs => {
         const last = msgs[msgs.length - 1];

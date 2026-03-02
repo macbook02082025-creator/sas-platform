@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Project } from '@sas-platform/shared-core';
+import { Project } from '@sas-platform/shared-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -30,5 +30,19 @@ export class DashboardService {
   closeModal() {
     this.showProjectModal.set(false);
     this.editingProjectId.set(null);
+  }
+
+  // API KEY MODAL
+  showApiKeyModal = signal(false);
+  activeProjectId = signal<string | null>(null);
+
+  openApiKeyModal(projectId: string) {
+    this.activeProjectId.set(projectId);
+    this.showApiKeyModal.set(true);
+  }
+
+  closeApiKeyModal() {
+    this.showApiKeyModal.set(false);
+    this.activeProjectId.set(null);
   }
 }

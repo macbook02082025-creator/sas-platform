@@ -1,17 +1,13 @@
 import { Route } from '@angular/router';
 import { authGuard, publicGuard } from '@sas-platform/shared-core';
-import { LoginComponent } from './login';
-import { SignupComponent } from './signup';
+import { loadRemoteModule } from '@nx/angular/mf';
 
 export const appRoutes: Route[] = [
   {
     path: 'auth',
     canActivate: [publicGuard],
-    children: [
-      { path: 'login', component: LoginComponent },
-      { path: 'signup', component: SignupComponent },
-      { path: '', redirectTo: 'login', pathMatch: 'full' },
-    ]
+    loadChildren: () =>
+      loadRemoteModule('mfeAuth', './Routes').then((m) => m.remoteRoutes),
   },
   {
     path: 'dashboard',

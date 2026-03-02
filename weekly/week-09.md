@@ -1,31 +1,26 @@
-# Week 9: Telemetry & Quality Score Dashboard
+# Week 9: Telemetry & Quality Score Dashboard [ACTIVE]
 
 ## Goals
-Provide comprehensive observability into how the AI is performing in production, focusing on quality, cost, and latency.
+<span style="color:blue">Provide comprehensive observability into AI performance, focusing on quality, cost, and latency using industry-standard telemetry tools.</span>
 
 ## Technical Tasks
 
 ### 1. Telemetry & Logging
-*   **Data Capture:** Log every interaction to the Postgres database.
-*   **Fields:** Include timestamp, tenant ID, skill ID, raw user prompt, injected RAG context, final AI response, latency (ms), and token usage (prompt + completion tokens).
-*   **Tracing:** Implement LangSmith or Phoenix in the Python service for deep LLM trace analysis.
+*   <span style="color:red">**Structured Logging:** [DONE] Implemented **Pino** for machine-readable, high-performance JSON logging in the API.</span>
+*   <span style="color:red">**Tracing:** [DONE] Integrated **LangSmith** for deep LLM trace analysis, capturing prompts, RAG context, and hallucinations.</span>
+*   <span style="color:red">**Errors:** [DONE] RFC 7807 standardized error handling with unique `traceId` correlation.</span>
 
 ### 2. Analytics Aggregation
-*   **Backend (NestJS):** Create optimized SQL views or cron jobs to aggregate daily/weekly metrics per skill and per organization.
-*   **Metrics:** Calculate "Acceptance Rate" (no HITL escalation), "Hallucination Rate" (failed citation checks), and average cost per query.
+*   **Metrics:** Tracking token usage and cost per query in the vault.
+*   **In-Progress:** Aggregating daily/weekly metrics per skill.
 
 ### 3. "AI Quality Score" UI
-*   **Angular Dashboard:** Build a new Analytics view.
-*   **Data Visualization:** Use a charting library (like Chart.js or D3/ECharts via Angular wrappers) to display:
-    *   Volume over time (bar charts).
-    *   Escalation rate (pie charts).
-    *   Average response latency (line graphs).
+*   <span style="color:red">**Stats Dashboard:** [DONE] Implemented a modern analytics view in the shell displaying project activity and health metrics.</span>
 
 ### 4. User Feedback Loop
-*   **SDK Update:** Add "Thumbs Up / Thumbs Down" buttons to the embedded chat widget.
-*   **API:** Create endpoints to receive and link this explicit user feedback back to the specific interaction log in the database.
+*   **Status:** Designing the thumbs-up/down feedback mechanism.
 
 ## Deliverables
-*   A fully functional Analytics dashboard providing real-time insights into AI performance.
-*   The ability to track token usage and calculate costs per tenant.
-*   A closed-loop system capturing end-user feedback.
+*   <span style="color:red">Real-time observability via LangSmith and Pino.</span>
+*   <span style="color:red">Standardized error tracking via trace correlation.</span>
+*   <span style="color:blue">Live Analytics Dashboard providing core health insights.</span>

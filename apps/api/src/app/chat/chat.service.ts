@@ -16,14 +16,20 @@ export class ChatService {
     systemPrompt: string,
     userInput: string,
     res: Response,
+    ragEnabled = false,
   ) {
     try {
-      this.logger.log(`Proxying chat request to AI Engine for tenant: ${tenantId}, skill: ${skillId}`);
+      this.logger.log(`Proxying chat request to AI Engine for tenant: ${tenantId}, skill: ${skillId}, RAG: ${ragEnabled}`);
       
       const response = (await firstValueFrom(
         this.httpService.post(
           `${this.AI_ENGINE_URL}/api/v1/chat`,
-          { tenant_id: tenantId, system_prompt: systemPrompt, user_input: userInput },
+          { 
+            tenant_id: tenantId, 
+            system_prompt: systemPrompt, 
+            user_input: userInput,
+            rag_enabled: ragEnabled
+          },
           { responseType: 'stream' },
         ),
       )) as any;

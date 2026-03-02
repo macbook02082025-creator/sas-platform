@@ -3,17 +3,7 @@ import { inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap, catchError, of } from 'rxjs';
-
-export interface Project {
-  id: string;
-  name: string;
-  description?: string;
-  load: number;
-  organizationId: string;
-  createdAt: string;
-  updatedAt: string;
-  skills?: { id: string; name: string }[];
-}
+import { Project } from '@sas-platform/shared-dto';
 
 export interface ProjectsState {
   projects: Project[];
@@ -58,7 +48,7 @@ export const ProjectsStore = signalStore(
             ),
             catchError((err) => {
               patchState(store, { isLoading: false, error: err.message });
-              return of(null);
+              return of(null as any);
             })
           )
         )
@@ -78,7 +68,7 @@ export const ProjectsStore = signalStore(
             ),
             catchError((err) => {
               patchState(store, { isLoading: false, error: err.message });
-              return of(null);
+              return of(null as any);
             })
           );
         })
@@ -97,7 +87,7 @@ export const ProjectsStore = signalStore(
             ),
             catchError((err) => {
               patchState(store, { isLoading: false, error: err.message });
-              return of(null);
+              return of(null as any);
             })
           )
         )

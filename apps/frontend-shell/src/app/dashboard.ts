@@ -6,11 +6,12 @@ import { filter, map, startWith } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthStore, ThemeStore, ProjectsStore, Theme, ConfirmStore } from '@sas-platform/shared-core';
 import { DashboardService } from './dashboard.service';
+import { ApiKeysModalComponent } from './api-keys-modal';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ApiKeysModalComponent],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss'],
 })

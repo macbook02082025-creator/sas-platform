@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AuthStore } from '@sas-platform/shared-core';
+import { RegisterDto } from '@sas-platform/shared-dto';
 
 @Component({
   selector: 'app-signup',
@@ -24,7 +25,7 @@ export class SignupComponent {
 
   onSubmit() {
     if (this.signupForm.valid) {
-      this.authStore.register(this.signupForm.value);
+      this.authStore.register(this.signupForm.getRawValue() as RegisterDto);
     }
   }
 }

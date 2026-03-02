@@ -7,6 +7,11 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str | None = None
     DATABASE_URL: str | None = None
     
+    # LangSmith Tracing
+    LANGSMITH_TRACING: str = "false"
+    LANGSMITH_API_KEY: str | None = None
+    LANGSMITH_PROJECT: str = "sas-platform"
+    
     # Enable mock mode if no API key is provided
     @property
     def MOCK_MODE(self) -> bool:

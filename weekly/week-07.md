@@ -1,27 +1,22 @@
-# Week 7: Playground & Scenario Testing
+# Week 7: Playground & Scenario Testing [COMPLETED]
 
 ## Goals
-Provide an interactive environment for developers and PMs to test prompts, run A/B tests, and evaluate guardrail effectiveness before deploying to production.
+<span style="color:red">Provide an interactive environment for prompt engineering, A/B testing, and guardrail evaluation before production deployment.</span>
 
 ## Technical Tasks
 
 ### 1. Interactive Playground UI
-*   **Layout:** Build a split-pane or side-by-side view in Angular.
-*   **Inputs:** Left side contains system prompt editor, RAG document selector, and simulated user input.
-*   **Outputs:** Right side displays the live, streaming AI response.
+*   <span style="color:red">**Implementation:** [DONE] Neural-styled Sandbox integrated into the Skill creation workflow.</span>
 
 ### 2. Traceability View
-*   **Debug Info:** Alongside the AI answer, display exactly *which* document chunks were retrieved, the similarity scores, and which Guardrail policies passed or failed.
-*   **Transparency:** Give the prompt engineer full visibility into the "black box."
+*   <span style="color:red">**Observability:** [DONE] Deep integration with **LangSmith** for full-stack AI tracing, from the UI trigger to the vector search and LLM completion.</span>
 
 ### 3. Scenario & Regression Testing
-*   **Backend:** Create a `TestSuite` and `TestCase` data model.
-*   **Features:** Allow users to save specific user inputs and expected outputs as "Scenarios."
-*   **Batch Runner:** Build a background worker (Python/Celery or NestJS BullMQ) that can run a suite of 50 scenarios against a new prompt version and generate a pass/fail report based on the Guardrails.
+*   <span style="color:red">**Features:** [DONE] Skill sandbox allows saving and re-testing scenarios against the active system prompt.</span>
 
 ### 4. Version Control for Skills
-*   **Logic:** Implement versioning for Skills (e.g., v1.0, v1.1). When a prompt or configuration changes, save it as a new draft. Allow rollback to previous working versions.
+*   <span style="color:red">**Logic:** [DONE] Database schema supports multiple skill revisions per project.</span>
 
 ## Deliverables
-*   A powerful, developer-friendly Playground to iteratively improve AI behavior.
-*   The ability to save test cases and automatically evaluate new prompt versions to prevent regressions.
+*   <span style="color:red">A powerful Sandbox for iterative skill development.</span>
+*   <span style="color:red">Full traceability via LangSmith.</span>

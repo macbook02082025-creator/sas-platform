@@ -1,0 +1,61 @@
+@if (dashboardService.showApiKeyModal()) {
+  <div class="modal-overlay" (click)="dashboardService.closeApiKeyModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="material-symbols-rounded">key</span>
+          Intelligence Access Keys
+        </div>
+        <button class="close-btn" (click)="dashboardService.closeApiKeyModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-subtitle">Generate and manage secure keys to access this unit via the SDK or API.</p>
+
+        <!-- CREATE NEW KEY -->
+        <div class="new-key-section">
+          <div class="input-group">
+            <label>Key Name</label>
+            <div class="input-with-action">
+              <input type="text" [(ngModel)]="newKeyName" placeholder="e.g. Production Web SDK" (keyup.enter)="createKey()">
+              <button class="action-btn" [disabled]="!newKeyName()" (click)="createKey()">Generate</button>
+            </div>
+          </div>
+        </div>
+
+        @if (apiKeysStore.isLoading()) {
+          <div class="loading-state">Synchronizing secure vault...</div>
+        } @else {
+          <div class="keys-list">
+            @for (key of apiKeysStore.keys(); track key.id) {
+              <div class="key-item">
+                <div class="key-info">
+                  <div class="key-name">{{key.name}}</div>
+                  <div class="key-meta">
+                    <span class="key-prefix">{{key.prefix}}••••••••</span>
+                    <span class="dot">·</span>
+                    <span>Created {{key.createdAt | date:'shortDate'}}</span>
+                  </div>
+                </div>
+                <div class="key-actions">
+                  <button class="icon-btn danger" (click)="deleteKey(key.id)" title="Revoke Access">
+                    <span class="material-symbols-rounded">delete</span>
+                  </button>
+                </div>
+              </div>
+            } @empty {
+              <div class="empty-keys">
+                <span class="material-symbols-rounded">lock_open</span>
+                <p>No active access keys found for this unit.</p>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button class="cancel-btn" (click)="dashboardService.closeApiKeyModal()">Dismiss</button>
+      </div>
+    </div>
+  </div>
+}

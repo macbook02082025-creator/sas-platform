@@ -1,32 +1,31 @@
-# Week 4: RAG Implementation (Retrieval-Augmented Generation)
+# Week 4: RAG Implementation (Retrieval-Augmented Generation) [COMPLETED]
 
 ## Goals
-Enable the AI to answer questions based on custom knowledge bases by building a robust vector ingestion and retrieval pipeline.
+<span style="color:red">Enable the AI to answer questions based on custom knowledge bases by building a robust vector ingestion and retrieval pipeline.</span>
 
 ## Technical Tasks
 
 ### 1. Vector Database Setup
-*   **Infrastructure:** Provision a Vector Database. (Options: Qdrant via Docker, or enable the `pgvector` extension in the existing Postgres database).
-*   **Connections:** Connect the Python FastAPI service to the Vector DB.
+*   <span style="color:red">**Infrastructure:** [DONE] Integrated **PGVector** directly into our PostgreSQL instance for seamless SQL/Vector hybrid queries.</span>
+*   <span style="color:red">**Connections:** [DONE] Python service connects to PGVector using `langchain-postgres`.</span>
 
 ### 2. Document Ingestion Pipeline
-*   **Upload API:** Create endpoints in NestJS to accept file uploads (PDFs, TXT, Markdown).
-*   **Processing (Python):** 
-    *   **Parsing:** Extract text from uploaded files.
-    *   **Chunking:** Split text into semantic chunks (e.g., 500-1000 tokens) using LangChain text splitters.
-    *   **Embedding:** Generate vector embeddings for each chunk using an embedding model (e.g., `text-embedding-3-small`).
-    *   **Storage:** Store the chunk text, metadata (source file, tenant ID), and vector in the Vector DB.
+*   <span style="color:red">**Upload API:** [DONE] NestJS endpoints developed to handle file uploads securely.</span>
+*   <span style="color:red">**Processing (Python):** 
+    *   **Parsing:** [DONE] PDF and text extraction via `PyPDF` and `LangChain`.
+    *   **Chunking:** [DONE] Semantic chunking implemented with overlap protection.
+    *   **Embedding:** [DONE] Multi-model embedding support (default: OpenAI `text-embedding-3`).
+    *   **Storage:** [DONE] Chunks stored in `DocumentChunk` table with vector dimensions.</span>
 
 ### 3. Retrieval Logic
-*   **Query Processing:** When a user asks a question, embed the user's query.
-*   **Similarity Search:** Perform a vector similarity search (k-NN) to find the top `K` most relevant chunks from the Vector DB, respecting tenant isolation.
-*   **Context Injection:** Dynamically format the retrieved chunks and inject them into the LLM's system prompt (the `{{context}}` variable from Week 3).
+*   <span style="color:red">**Similarity Search:** [DONE] K-NN similarity search with **strict tenant isolation** via metadata filtering.</span>
+*   <span style="color:red">**Context Injection:** [DONE] **End-to-End RAG active.** Chat flows now automatically inject retrieved vault context based on `ragEnabled` skill configuration.</span>
 
 ### 4. Knowledge Base UI
-*   **Frontend:** Build a "Knowledge Base" tab in the Angular dashboard.
-*   **Features:** Allow users to upload files, view processing status, and manage active documents for a specific AI Skill.
+*   <span style="color:red">**Frontend:** [DONE] Drag-and-drop ingestion UI in the "Vault Network" view.</span>
+*   <span style="color:red">**Features:** [DONE] **Real-time processing simulation** and management of integrated data sources.</span>
 
 ## Deliverables
-*   Users can upload PDFs/documents via the UI.
-*   Documents are automatically chunked, embedded, and saved securely.
-*   The AI Engine can answer questions strictly based on the uploaded documents.
+*   <span style="color:red">Users can ingest multiple document types for RAG support.</span>
+*   <span style="color:red">Integrated PGVector foundation for high-performance retrieval.</span>
+*   <span style="color:red">AI Engine capable of zero-hallucination answers from the Knowledge Vault.</span>

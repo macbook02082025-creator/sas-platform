@@ -69,37 +69,53 @@ export class KnowledgeService {
   }
 
   async deleteDocument(organizationId: string, id: string) {
+    this.logger.log(`Starting deletion sequence for document: ${id} (Tenant: ${organizationId})`);
+    
     try {
       const doc = await this.prisma.knowledge.findFirst({
         where: { id, organizationId },
       });
 
       if (!doc) {
+        this.logger.warn(`Deletion failed: Document ${id} not found for tenant ${organizationId}`);
         throw new NotFoundException('Document not found or access denied');
       }
 
       // Notify AI Engine
-      await firstValueFrom(
-        this.httpService.post(`${this.AI_ENGINE_URL}/api/v1/knowledge/delete`, {
-          tenant_id: organizationId,
-          file_name: doc.name,
-        }),
-      );
+      try {
+        this.logger.log(`Syncing deletion with AI Engine for: ${doc.name}`);
+        await firstValueFrom(
+          this.httpService.post(`${this.AI_ENGINE_URL}/api/v1/knowledge/delete`, {
+            tenant_id: organizationId,
+            file_name: doc.name,
+          }),
+        );
+      } catch (aeError: any) {
+        this.logger.error(`AI Engine sync failed: ${aeError.response?.data?.detail || aeError.message}`);
+      }
 
       // Delete from DB
+      this.logger.log(`Removing record from database: ${id}`);
       const deleted = await this.prisma.knowledge.delete({
         where: { id },
       });
 
-      await this.activityService.logActivity({
-        type: 'KNOWLEDGE_DELETED',
-        description: `Knowledge fragment "${doc.name}" was purged from the neural network.`,
-        organizationId: organizationId,
-      });
+      // Log Activity
+      try {
+        this.logger.log(`Recording activity for deletion of: ${doc.name}`);
+        await this.activityService.logActivity({
+          type: 'KNOWLEDGE_DELETED',
+          description: `Knowledge fragment "${doc.name}" was purged from the neural network.`,
+          organizationId: organizationId,
+        });
+      } catch (actError: any) {
+        this.logger.error(`Activity logging failed: ${actError.message}`);
+      }
 
+      this.logger.log(`Deletion successful for: ${id}`);
       return deleted;
     } catch (error) {
-      this.logger.error(`Failed to delete document ${id}:`, error.message);
+      this.logger.error(`CRITICAL: deleteDocument failed at some step:`, error instanceof Error ? error.stack : error);
       throw error;
     }
   }

@@ -1,7 +1,8 @@
 import { Component, inject, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ProjectsStore, Project, ConfirmStore } from '@sas-platform/shared-core';
+import { ProjectsStore, ConfirmStore } from '@sas-platform/shared-core';
+import { Project } from '@sas-platform/shared-dto';
 import { DashboardService } from './dashboard.service';
 
 @Component({
@@ -39,6 +40,12 @@ export default class OverviewComponent implements OnInit {
     this.activeMenuId.set(null);
   }
 
+  manageApiKeys(event: Event, projectId: string) {
+    event.stopPropagation();
+    this.dashboardService.openApiKeyModal(projectId);
+    this.activeMenuId.set(null);
+  }
+
   async deleteProject(event: Event, id: string) {
     event.stopPropagation();
     
@@ -68,9 +75,10 @@ export default class OverviewComponent implements OnInit {
     card.style.setProperty('--cy', '50%');
   }
 
-  formatTime(dateString: string): string {
+  formatTime(dateString: string | Date | undefined): string {
+    if (!dateString) return '';
     const date = new Date(dateString);
-    if (isNaN(date.getTime())) return dateString;
+    if (isNaN(date.getTime())) return dateString.toString();
     
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
@@ -86,7 +94,7 @@ export default class OverviewComponent implements OnInit {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 
-  isSameDate(d1: string, d2: string): boolean {
+  isSameDate(d1: string | Date | undefined, d2: string | Date | undefined): boolean {
     if (!d1 || !d2) return true;
     return new Date(d1).getTime() === new Date(d2).getTime();
   }

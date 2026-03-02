@@ -31,10 +31,12 @@ export class ChatController {
     @Body() body: { skillId?: string; systemPrompt?: string; user_input: string },
   ) {
     let systemPrompt = body.systemPrompt;
+    let ragEnabled = false;
     
     if (body.skillId) {
       const skill = await this.skillsService.findOne(req.tenantId, body.skillId);
       systemPrompt = skill.systemPrompt;
+      ragEnabled = skill.ragEnabled || false;
     }
 
     if (!systemPrompt) {
@@ -48,6 +50,7 @@ export class ChatController {
       systemPrompt,
       body.user_input,
       res,
+      ragEnabled,
     );
   }
 }

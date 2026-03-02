@@ -35,7 +35,11 @@ export default class StatsDashboardComponent implements OnInit {
   // DYNAMIC SKILLS FROM DB
   readonly recentSkills = computed(() => {
     return [...this.skillsStore.skills()]
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      })
       .slice(0, 5)
       .map(s => ({
         ...s,
@@ -114,9 +118,10 @@ export default class StatsDashboardComponent implements OnInit {
     card.style.setProperty('--cy', '50%');
   }
 
-  formatTime(dateString: string): string {
+  formatTime(dateString: string | Date | undefined): string {
+    if (!dateString) return '';
     const date = new Date(dateString);
-    if (isNaN(date.getTime())) return dateString;
+    if (isNaN(date.getTime())) return dateString.toString();
     
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();

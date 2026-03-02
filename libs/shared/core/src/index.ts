@@ -8,4 +8,5 @@ export * from './lib/projects.store';
 export * from './lib/activity.store';
 export * from './lib/stats.store';
 export * from './lib/auth.interceptor';
+export * from './lib/api-keys.store';
 export * from './lib/confirm.store';

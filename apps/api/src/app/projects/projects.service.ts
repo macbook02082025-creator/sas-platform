@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { ActivityService } from '../activity/activity.service';
 
+import { Project } from '@sas-platform/shared-dto';
+
 @Injectable()
 export class ProjectsService {
   constructor(
@@ -9,7 +11,7 @@ export class ProjectsService {
     private activityService: ActivityService
   ) {}
 
-  async create(tenantId: string, name: string, description?: string) {
+  async create(tenantId: string, name: string, description?: string): Promise<Project> {
     const project = await this.prisma.project.create({
       data: {
         name,
@@ -26,27 +28,28 @@ export class ProjectsService {
       projectId: project.id,
     });
 
-    return project;
+    return project as unknown as Project;
   }
 
-  async findAll(tenantId: string) {
-    return this.prisma.project.findMany({
+  async findAll(tenantId: string): Promise<Project[]> {
+    return (await this.prisma.project.findMany({
       where: { organizationId: tenantId },
       include: {
         skills: {
           select: {
             id: true,
             name: true,
+            projectId: true,
           }
         },
         _count: {
           select: { skills: true, apiKeys: true },
         },
       },
-    });
+    })) as unknown as Project[];
   }
 
-  async findOne(tenantId: string, id: string) {
+  async findOne(tenantId: string, id: string): Promise<Project> {
     const project = await this.prisma.project.findFirst({
       where: { id, organizationId: tenantId },
       include: {
@@ -59,10 +62,10 @@ export class ProjectsService {
       throw new NotFoundException('Project not found');
     }
 
-    return project;
+    return project as unknown as Project;
   }
 
-  async update(tenantId: string, id: string, data: { name?: string; description?: string }) {
+  async update(tenantId: string, id: string, data: { name?: string; description?: string }): Promise<Project> {
     const project = await this.findOne(tenantId, id);
     const updated = await this.prisma.project.update({
       where: { id },
@@ -76,10 +79,10 @@ export class ProjectsService {
       projectId: id,
     });
 
-    return updated;
+    return updated as unknown as Project;
   }
 
-  async delete(tenantId: string, id: string) {
+  async delete(tenantId: string, id: string): Promise<Project> {
     const project = await this.findOne(tenantId, id);
     const deleted = await this.prisma.project.delete({
       where: { id },
@@ -91,6 +94,6 @@ export class ProjectsService {
       organizationId: tenantId,
     });
 
-    return deleted;
+    return deleted as unknown as Project;
   }
 }

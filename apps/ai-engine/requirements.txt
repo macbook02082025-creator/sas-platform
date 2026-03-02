@@ -13,3 +13,7 @@ faiss-cpu==1.8.0
 tiktoken==0.7.0
 pypdf==5.0.0
 python-multipart==0.0.12
+langsmith
+pgvector
+langchain-postgres
+psycopg2-binary

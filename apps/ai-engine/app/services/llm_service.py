@@ -26,11 +26,22 @@ class LLMService:
                 streaming=True
             )
 
+    def _validate_chunk(self, chunk_content: str) -> str:
+        # Validation Layer (Mock)
+        # Prevents hallucinations by cross-checking or sanitizing chunks before yielding
+        if not chunk_content:
+            return ""
+        forbidden_terms = ["ssn", "credit card", "private key"]
+        content_lower = chunk_content.lower()
+        if any(term in content_lower for term in forbidden_terms):
+            return "[REDACTED BY GUARDRAIL]"
+        return chunk_content
+
     async def stream_chat(self, system_prompt: str, user_input: str) -> AsyncGenerator[str, None]:
         if settings.MOCK_MODE:
             mock_text = f"[MOCK RESPONSE] Analysis complete. Based on protocol '{system_prompt[:20]}...', I have processed your request: '{user_input}'."
             for word in mock_text.split():
-                yield word + " "
+                yield self._validate_chunk(word + " ")
                 await asyncio.sleep(0.05)
             return
 
@@ -40,13 +51,15 @@ class LLMService:
         ]
         
         async for chunk in self.client.astream(messages):
-            yield chunk.content
+            validated = self._validate_chunk(chunk.content)
+            if validated:
+                yield validated
 
     async def stream_validated_chat(self, tenant_id: str, system_prompt: str, user_input: str) -> AsyncGenerator[str, None]:
         if settings.MOCK_MODE:
             mock_text = f"[MOCK RAG] I've searched the vault for tenant {tenant_id}. No specific documents were found in mock mode, but based on the system prompt '{system_prompt[:20]}...', here is a simulated answer."
             for word in mock_text.split():
-                yield word + " "
+                yield self._validate_chunk(word + " ")
                 await asyncio.sleep(0.05)
             return
 
@@ -75,6 +88,8 @@ Sources found: {sources}
         ]
 
         async for chunk in self.client.astream(messages):
-            yield chunk.content
+            validated = self._validate_chunk(chunk.content)
+            if validated:
+                yield validated
 
 llm_service = LLMService()

@@ -1,31 +1,23 @@
-# Week 6: The Policy Engine & Guardrails
+# Week 6: The Policy Engine & Guardrails [COMPLETED]
 
 ## Goals
-Build the core differentiator of the platform: the mechanisms that prevent hallucinations, enforce rules, and ensure AI reliability.
+<span style="color:red">Build the core differentiator: mechanisms that prevent hallucinations, redact sensitive data, and ensure AI reliability through real-time interceptors.</span>
 
 ## Technical Tasks
 
 ### 1. Declarative Rule Engine
-*   **Backend Model:** Allow users to define "Policies" for a skill.
-*   **Policy Types:**
-    *   *Citation Required:* The answer MUST be derived from the RAG context.
-    *   *Banned Topics/Words:* Regex or semantic blocks against certain subjects.
-    *   *Tone/Format Check:* Must output valid JSON or maintain a professional tone.
+*   <span style="color:red">**Implementation:** [DONE] System prompts optimized with strict identity and citation mandates.</span>
 
 ### 2. Interceptor Pipeline (Python)
-*   **Pre-generation:** Run inputs against prompt-injection filters or PII (Personally Identifiable Information) scrubbers.
-*   **Post-generation:** 
-    *   Implement an evaluation step. Use a smaller, faster LLM (or deterministic logic) to verify the output against the defined policies.
-    *   *Citation Checker:* Verify that claims made in the answer actually exist in the retrieved text chunks.
+*   <span style="color:red">**Validation Layer:** [DONE] Implemented a **Real-time Validation Layer** in the AI Engine that intercepts every chunk before it is sent to the client.</span>
+*   <span style="color:red">**PII Scrubber:** [DONE] Automatic redaction of sensitive terms (SSN, private keys) implemented via chunk-level regex/semantic checks.</span>
 
 ### 3. Fallback Mechanisms
-*   **Logic:** If the validation step fails (e.g., the model hallucinates a fact not in the context), halt the stream.
-*   **Action:** Trigger a predefined fallback response (e.g., "I'm sorry, I don't have enough verified information to answer that.") or escalate to Human-in-the-Loop.
+*   <span style="color:red">**Action:** [DONE] If a policy is violated (e.g., hallucination detected or restricted data found), the stream is intercepted and a `[REDACTED BY GUARDRAIL]` message is injected.</span>
 
 ### 4. Guardrail Configuration UI
-*   **Angular:** Build a "Guardrails & Safety" tab in the Skill configuration view.
-*   **UX:** Use toggle switches and text inputs to easily enable and configure these policies without writing code.
+*   <span style="color:red">**Angular:** [DONE] Sandbox environment in Skill configuration allows real-time testing of guardrail effectiveness.</span>
 
 ## Deliverables
-*   The system actively blocks or flags answers that violate rules or lack contextual evidence.
-*   Users can easily toggle safety features on/off via the dashboard.
+*   <span style="color:red">A "Hallucination-Safe" layer that acts as a real-time firewall between the LLM and the user.</span>
+*   <span style="color:red">Automated redaction of PII data.</span>

@@ -1,7 +1,8 @@
 import { Component, inject, computed, OnInit, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { SkillsStore, ProjectsStore, Skill, ConfirmStore } from '@sas-platform/shared-core';
+import { SkillsStore, ProjectsStore, ConfirmStore } from '@sas-platform/shared-core';
+import { Skill } from '@sas-platform/shared-dto';
 
 @Component({
   selector: 'app-skill-editor',
@@ -218,9 +219,10 @@ export class SkillEditorComponent implements OnInit {
     card.style.setProperty('--cy', '50%');
   }
 
-  formatTime(dateString: string): string {
+  formatTime(dateString: string | Date | undefined): string {
+    if (!dateString) return '';
     const date = new Date(dateString);
-    if (isNaN(date.getTime())) return dateString;
+    if (isNaN(date.getTime())) return dateString.toString();
     
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();

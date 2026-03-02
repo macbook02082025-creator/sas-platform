@@ -12,7 +12,7 @@ import { PrismaService } from '../prisma.service';
 export class TenantInterceptor implements NestInterceptor {
   constructor(private prisma: PrismaService) {}
 
-  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
+  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<unknown>> {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
@@ -23,7 +23,7 @@ export class TenantInterceptor implements NestInterceptor {
     // Find the organization this user belongs to
     const tenantIdFromHeader = request.headers['x-tenant-id'] as string;
 
-    const membership = (await this.prisma.organizationMember.findFirst({
+    const membership = await this.prisma.organizationMember.findFirst({
       where: {
         userId: request.user.sub,
         ...(tenantIdFromHeader ? { organizationId: tenantIdFromHeader } : {}),
@@ -31,7 +31,7 @@ export class TenantInterceptor implements NestInterceptor {
       include: {
         organization: true,
       },
-    })) as any;
+    });
 
     if (!membership) {
       throw new UnauthorizedException(

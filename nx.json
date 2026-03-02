@@ -66,6 +66,14 @@
         "watchDepsTargetName": "watch-deps",
         "serveStaticTargetName": "webpack:serve-static"
       }
+    },
+    {
+      "plugin": "@nx/vitest",
+      "options": {
+        "testTargetName": "vitest:test",
+        "ciTargetName": "test-ci",
+        "testMode": "watch"
+      }
     }
   ],
   "generators": {

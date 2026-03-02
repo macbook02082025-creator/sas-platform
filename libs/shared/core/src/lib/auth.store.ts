@@ -1,6 +1,7 @@
 import { signalStore, withState, withMethods, patchState, withHooks } from '@ngrx/signals';
 import { inject } from '@angular/core';
-import { AuthService, User, AuthResponse } from './auth.service';
+import { AuthService } from './auth.service';
+import { User, AuthResponse, LoginDto, RegisterDto } from '@sas-platform/shared-dto';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap, catchError, of } from 'rxjs';
 import { Router } from '@angular/router';
@@ -25,7 +26,7 @@ export const AuthStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withMethods((store, authService = inject(AuthService), router = inject(Router)) => ({
-    login: rxMethod<any>(
+    login: rxMethod<LoginDto>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((credentials) =>
@@ -53,7 +54,7 @@ export const AuthStore = signalStore(
         )
       )
     ),
-    register: rxMethod<any>(
+    register: rxMethod<RegisterDto>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((data) =>

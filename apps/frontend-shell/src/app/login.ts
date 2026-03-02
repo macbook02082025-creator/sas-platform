@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AuthStore } from '@sas-platform/shared-core';
+import { LoginDto } from '@sas-platform/shared-dto';
 
 @Component({
   selector: 'app-login',
@@ -21,7 +22,7 @@ export class LoginComponent {
 
   onSubmit() {
     if (this.loginForm.valid) {
-      this.authStore.login(this.loginForm.value);
+      this.authStore.login(this.loginForm.getRawValue() as LoginDto);
     }
   }
 }

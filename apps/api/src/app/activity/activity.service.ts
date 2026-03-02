@@ -14,8 +14,12 @@ export class ActivityService {
     organizationId: string;
     projectId?: string;
   }) {
-    const logMsg = `[${new Date().toISOString()}] LOGGING: ${data.type} - ${data.description}\n`;
-    fs.appendFileSync(path.join(process.cwd(), 'activity.log'), logMsg);
+    try {
+      const logMsg = `[${new Date().toISOString()}] LOGGING: ${data.type} - ${data.description}\n`;
+      fs.appendFileSync(path.join(process.cwd(), 'activity.log'), logMsg);
+    } catch (fsError) {
+      console.error('Failed to write to activity.log:', fsError.message);
+    }
     
     return this.prisma.activity.create({
       data,
