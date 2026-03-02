@@ -1,61 +1,170 @@
-<!-- DATA VAULT HEADER -->
-<div class="sec-header" style="margin-bottom: 24px">
-  <div class="sec-title-group">
-    <span class="sec-title">Vault Network</span>
-    <span class="sec-badge">{{documents().length}} sources</span>
-  </div>
-  <div class="sec-actions">
-    <div class="filter-btn">⚙ Sync All</div>
-    <button class="new-btn" (click)="fileInput.click()">
-      <span>+</span> Add Source
-    </button>
-    <input #fileInput type="file" style="display: none" (change)="onFileSelected($event)" multiple>
-  </div>
-</div>
-
-<div class="kb-grid">
-  <!-- UPLOAD ZONE -->
-  <div class="unit-card upload-zone" 
-       [class.dragging]="isDragging()" 
-       (dragover)="onDragOver($event)" 
-       (dragleave)="onDragLeave()" 
-       (drop)="onDrop($event)"
-       (click)="fileInput.click()">
-    <div class="new-plus">
-      <span class="material-symbols-rounded">cloud_upload</span>
-    </div>
-    <div class="new-lbl">Vault Ingestion</div>
-    <div class="new-sub">Drop PDF, MD, or TXT to index</div>
-    <div class="zone-hint">MAX 25MB PER SOURCE</div>
-  </div>
-
-  <!-- DOCUMENT CARDS -->
-  @for (doc of documents(); track doc.id) {
-    <div class="unit-card" #card (mousemove)="trackMouse($event, card)" (mouseleave)="resetMouse(card)">
-      <div class="uc-top">
-        <div class="uc-icon" [style.background]="doc.type === 'pdf' ? 'linear-gradient(135deg,#ef4444,#b91c1c)' : 'linear-gradient(135deg,#06b6d4,#0891b2)'">
-          <span class="material-symbols-rounded" style="font-size: 20px">description</span>
-        </div>
-        <div class="uc-menu">⋯</div>
+<div class="mid-row">
+  <div class="units-section">
+    <!-- DATA VAULT HEADER -->
+    <div class="sec-header">
+      <div class="sec-title-group">
+        <span class="sec-title">Vault Network</span>
+        <span class="sec-badge">{{documents().length}} sources</span>
       </div>
-      <div class="uc-name">{{doc.name}}</div>
-      <div class="uc-desc">Source metadata indexed. Vector embeddings generated. Ready for RAG retrieval.</div>
-      
-      <div class="uc-tags">
-        <span class="uc-tag">{{doc.type}}</span>
-        <span class="uc-tag">{{doc.size}}</span>
-      </div>
+      <div class="sec-actions">
+        <div class="seg-ctrl">
+          <div class="seg-btn" [class.on]="layout() === 'grid'" (click)="layout.set('grid')">
+            <span class="material-symbols-rounded">grid_view</span>
+          </div>
+          <div class="seg-btn" [class.on]="layout() === 'list'" (click)="layout.set('list')">
+            <span class="material-symbols-rounded">view_list</span>
+          </div>
+          <div class="seg-btn" [class.on]="layout() === 'details'" (click)="layout.set('details')">
+            <span class="material-symbols-rounded">view_agenda</span>
+          </div>
+        </div>
 
-      <div class="uc-footer">
-        <div class="uc-status">
-          <div class="pulse-dot dot-active"></div>
-          <span style="color:#22c55e">Indexed</span>
-        </div>
-        <div class="uc-id">
-          Added: {{formatTime(doc.updatedAt)}}
-        </div>
+        <div class="filter-btn">⚙ Sync All</div>
+        <button class="new-btn" (click)="fileInput.click()">
+          <span>+</span> Add Source
+        </button>
+        <input #fileInput type="file" style="display: none" (change)="onFileSelected($event)" multiple>
       </div>
     </div>
-  }
+
+    @if (layout() === 'grid') {
+      <div class="units-grid">
+        <!-- UPLOAD ZONE -->
+        <div class="unit-card upload-zone" 
+             [class.dragging]="isDragging()" 
+             (dragover)="onDragOver($event)" 
+             (dragleave)="onDragLeave()" 
+             (drop)="onDrop($event)"
+             (click)="fileInput.click()">
+          <div class="new-plus">
+            <span class="material-symbols-rounded">cloud_upload</span>
+          </div>
+          <div class="new-lbl">Vault Ingestion</div>
+          <div class="new-sub">Drop PDF, MD, or TXT to index</div>
+          <div class="zone-hint">MAX 25MB PER SOURCE</div>
+        </div>
+
+        <!-- DOCUMENT CARDS -->
+        @for (doc of documents(); track doc.id) {
+          <div class="unit-card" #card (mousemove)="trackMouse($event, card)" (mouseleave)="resetMouse(card)">
+            <div class="uc-top">
+              <div class="uc-icon" [style.background]="doc.type === 'pdf' ? 'linear-gradient(135deg, #ef4444, #991b1b)' : 'linear-gradient(135deg, #06b6d4, #0891b2)'">
+                <span class="material-symbols-rounded" style="font-size: 20px">description</span>
+              </div>
+              <div class="uc-menu-wrap" (click)="$event.stopPropagation()">
+              <div class="uc-menu" (click)="toggleMenu($event, doc.id)">⋯</div>
+              @if (activeMenuId() === doc.id) {
+                <div class="action-dropdown">
+                  <div class="ad-item ad-danger" (click)="deleteDocument($event, doc.id)">
+                    <span class="material-symbols-rounded">delete</span> Purge Source
+                  </div>
+                </div>
+              }
+            </div>
+            </div>
+            <div class="uc-name">{{doc.name}}</div>
+            <div class="uc-desc">Source metadata indexed. Vector embeddings generated. Ready for RAG retrieval.</div>
+
+            <div class="uc-tags">
+              <span class="uc-tag">{{doc.type.toUpperCase()}}</span>
+              <span class="uc-tag">{{doc.size}}</span>
+            </div>
+
+            <div class="uc-footer">
+              <div class="uc-status">
+                <div class="pulse-dot dot-active" [style.background]="doc.status === 'error' ? '#ef4444' : '#22c55e'"></div>
+                <span [style.color]="doc.status === 'error' ? '#ef4444' : '#22c55e'">{{doc.status === 'indexed' ? 'Operational' : doc.status.toUpperCase()}}</span>
+              </div>
+              <div class="uc-id">
+                Added: {{formatTime(doc.updatedAt)}}
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+ @else if (layout() === 'list') {
+      <div class="units-list">
+        @for (doc of documents(); track doc.id) {
+          <div class="list-item" #li (mousemove)="trackMouse($event, li)" (mouseleave)="resetMouse(li)">
+            <div class="li-icon" [style.background]="doc.type === 'pdf' ? '#ef4444' : '#06b6d4'" style="color: white">📄</div>
+            <div class="li-content">
+              <div class="li-header">
+                <div class="li-title">{{doc.name}}</div>
+                <div class="li-tags">
+                  <span class="uc-tag">{{doc.type}}</span>
+                  <span class="uc-tag">{{doc.size}}</span>
+                </div>
+              </div>
+              <div class="li-desc">Source metadata indexed. Vector embeddings generated.</div>
+            </div>
+            <div class="li-meta">
+              <div class="li-time">{{formatTime(doc.updatedAt)}}</div>
+              <div class="li-status">
+                <div class="pulse-dot dot-active"></div>
+                Indexed
+              </div>
+            </div>
+            <div class="li-actions-wrap" (click)="$event.stopPropagation()">
+              <div class="li-actions" (click)="toggleMenu($event, doc.id)">⋯</div>
+              @if (activeMenuId() === doc.id) {
+                <div class="action-dropdown ad-right">
+                  <div class="ad-item ad-danger" (click)="deleteDocument($event, doc.id)">
+                    <span class="material-symbols-rounded">delete</span> Purge
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+        <div class="list-item new-list-item" (click)="fileInput.click()">
+          <div class="li-icon" style="color: var(--v)">+</div>
+          <div class="li-title">Ingest New Data Source</div>
+        </div>
+      </div>
+    } @else {
+      <!-- DETAILS VIEW -->
+      <div class="details-list">
+        @for (doc of documents(); track doc.id) {
+          <div class="details-item" #di (mousemove)="trackMouse($event, di)" (mouseleave)="resetMouse(di)">
+            <div class="di-main">
+              <div class="di-top">
+                <div class="di-id-box">FILE_HASH: {{doc.id}}</div>
+                <div class="di-status-pill">
+                  <div class="pulse-dot dot-active"></div>
+                  VECTOR_SYNCED
+                </div>
+              </div>
+              <div class="di-name">{{doc.name}}</div>
+              <div class="di-prompt-label">SOURCE_METADATA_EXTRACTED:</div>
+              <div class="di-prompt-code">Content: Encrypted Vector Embeddings Status: {{doc.status}} Size: {{doc.size}} Type: {{doc.type}}</div>
+              <div class="di-meta-grid">
+                 <div class="dm-item">
+                  <div class="dm-lbl">LAST_SYNC</div>
+                  <div class="dm-val">{{doc.updatedAt}}</div>
+                </div>
+                <div class="dm-item">
+                  <div class="dm-lbl">VECTOR_DIMENSIONS</div>
+                  <div class="dm-val">1536</div>
+                </div>
+                <div class="dm-item">
+                  <div class="dm-lbl">ACCESS_CONTROL</div>
+                  <div class="dm-val">RESTRICTED</div>
+                </div>
+              </div>
+            </div>
+            <div class="di-side-actions">
+               <button class="di-btn">
+                 <span class="material-symbols-rounded">sync</span>
+               </button>
+               <button class="di-btn di-danger" (click)="deleteDocument($event, doc.id)">
+                 <span class="material-symbols-rounded">delete</span>
+               </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
 </div>
 

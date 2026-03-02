@@ -8,7 +8,7 @@ alias deactivate 'test $?_OLD_VIRTUAL_PATH != 0 && setenv PATH "$_OLD_VIRTUAL_PA
 # Unset irrelevant variables.
 deactivate nondestructive
 
-setenv VIRTUAL_ENV "/Users/naveensingh/Desktop/SAS/sas-platform/apps/ai-engine/venv"
+setenv VIRTUAL_ENV "/Users/naveensingh/SASS/sas-platform/apps/ai-engine/venv"
 
 set _OLD_VIRTUAL_PATH="$PATH"
 setenv PATH "$VIRTUAL_ENV/bin:$PATH"

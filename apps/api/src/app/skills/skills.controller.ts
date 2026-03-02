@@ -25,7 +25,7 @@ export class SkillsController {
   }
 
   @Get()
-  findAll(@Req() req: any, @Query('projectId') projectId: string) {
+  findAll(@Req() req: any, @Query('projectId') projectId?: string) {
     return this.skillsService.findAll(req.tenantId, projectId);
   }
 

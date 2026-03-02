@@ -1,7 +1,7 @@
 import { Component, inject, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ProjectsStore, ActivityStore, StatsStore, Project, ConfirmStore } from '@sas-platform/shared-core';
+import { ProjectsStore, Project, ConfirmStore } from '@sas-platform/shared-core';
 import { DashboardService } from './dashboard.service';
 
 @Component({
@@ -13,7 +13,6 @@ import { DashboardService } from './dashboard.service';
 })
 export default class OverviewComponent implements OnInit {
   readonly projectsStore = inject(ProjectsStore);
-  readonly activityStore = inject(ActivityStore);
   readonly dashboardService = inject(DashboardService);
   readonly confirmStore = inject(ConfirmStore);
   
@@ -23,11 +22,8 @@ export default class OverviewComponent implements OnInit {
   readonly activeMenuId = signal<string | null>(null);
   
   readonly projects = computed(() => this.projectsStore.projects());
-  readonly activities = computed(() => this.activityStore.activities());
 
   ngOnInit() {
-    this.activityStore.loadActivities();
-    
     // Global click listener to close menus
     window.addEventListener('click', () => this.activeMenuId.set(null));
   }

@@ -10,10 +10,11 @@ export class ActivityController {
   constructor(private activityService: ActivityService) {}
 
   @Get()
-  async getRecent(@Req() req: any, @Query('limit') limit?: string) {
+  async getRecent(@Req() req: any, @Query('limit') limit?: string, @Query('range') range?: string) {
     return this.activityService.getRecentActivity(
       req.tenantId, 
-      limit ? parseInt(limit, 10) : 10
+      limit ? parseInt(limit, 10) : 50,
+      range
     );
   }
 }

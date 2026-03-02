@@ -21,6 +21,6 @@ export class AuthController {
   @Get('me')
   @UseGuards(AuthGuard)
   async getMe(@Req() req: any) {
-    return this.authService.getMe(req.user.sub);
+    return this.authService.getMe(req.user.sub, req.user.sid);
   }
 }

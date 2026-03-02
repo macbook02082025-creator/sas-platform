@@ -1,0 +1,205 @@
+<div class="dashboard-container">
+  <div class="sec-header">
+    <div class="sec-title-group">
+      <span class="sec-title">Intelligence Control Center</span>
+      <span class="sec-badge">Operational Command</span>
+    </div>
+    <div class="sec-actions">
+      <div class="seg-ctrl date-filter">
+        @for (range of availableRanges; track range.id) {
+          <div class="seg-btn range-btn" 
+               [class.on]="selectedRange() === range.id" 
+               (click)="setRange(range.id)">
+            {{range.label}}
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPACT QUALITY KPIs (MINIMALIST) -->
+  <div class="compact-quality-header">
+    <div class="compact-stat-card">
+      <div class="cs-lbl">QUALITY_SCORE</div>
+      <div class="cs-val" style="color: #22c55e">94.1 <span class="cs-trend">↑ 2.3</span></div>
+    </div>
+    <div class="compact-stat-card">
+      <div class="cs-lbl">GROUNDED_RATE</div>
+      <div class="cs-val" style="color: #7c6fff">98.2% <span class="cs-trend">↑ 1.1</span></div>
+    </div>
+    <div class="compact-stat-card">
+      <div class="cs-lbl">REQUESTS_24H</div>
+      <div class="cs-val" style="color: #f59e0b">47.3k <span class="cs-trend">↑ 8.4</span></div>
+    </div>
+    <div class="compact-stat-card">
+      <div class="cs-lbl">HALLUCINATION_FLAGS</div>
+      <div class="cs-val" style="color: #ef4444">1.8% <span class="cs-trend">↓ 0.6</span></div>
+    </div>
+  </div>
+
+  <!-- OPERATIONAL METRICS (ORIGINAL UI RESTORED) -->
+  <div class="stats-grid ops-grid" style="margin-top: 12px;">
+    <div class="stat-card">
+      <div class="stat-glow" style="background:#7c6fff"></div>
+      <div class="stat-top">
+        <div class="stat-icon-box" style="background:rgba(124,111,255,0.14)">🧠</div>
+        <div class="stat-chip chip-up">↑ {{stats()?.activeUnitsTrend || '0%'}}</div>
+      </div>
+      <div class="stat-num" style="background:linear-gradient(135deg,#c4baff,#7c6fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
+        {{stats()?.activeUnits || 0}}
+      </div>
+      <div class="stat-lbl">Active Units</div>
+      <div class="stat-bar-track"><div class="stat-bar-fill" [style.width]="barWidths()['active'] || '0%'" style="background:linear-gradient(90deg,#7c6fff,#a78bfa)"></div></div>
+      <svg class="stat-spark" viewBox="0 0 80 36" preserveAspectRatio="none"><polyline points="0,30 12,22 24,26 36,14 48,18 60,8 72,12 80,4" fill="none" stroke="#7c6fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-glow" style="background:#22c55e"></div>
+      <div class="stat-top">
+        <div class="stat-icon-box" style="background:rgba(34,197,94,0.14)">🔬</div>
+        <div class="stat-chip chip-up">↑ {{stats()?.skillsTrend || '0 new'}}</div>
+      </div>
+      <div class="stat-num" style="background:linear-gradient(135deg,#86efac,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
+        {{stats()?.skillsDeployed || 0}}
+      </div>
+      <div class="stat-lbl">Skills Deployed</div>
+      <div class="stat-bar-track"><div class="stat-bar-fill" [style.width]="barWidths()['skills'] || '0%'" style="background:linear-gradient(90deg,#22c55e,#86efac)"></div></div>
+      <svg class="stat-spark" viewBox="0 0 80 36" preserveAspectRatio="none"><polyline points="0,32 12,28 24,24 36,20 48,15 60,10 72,8 80,4" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-glow" style="background:#06b6d4"></div>
+      <div class="stat-top">
+        <div class="stat-icon-box" style="background:rgba(6,182,212,0.14)">🗄️</div>
+        <div class="stat-chip chip-neu">{{stats()?.vaultsTrend || '0GB'}}</div>
+      </div>
+      <div class="stat-num" style="background:linear-gradient(135deg,#67e8f9,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
+        {{stats()?.dataVaults || 0}}
+      </div>
+      <div class="stat-lbl">Data Vaults</div>
+      <div class="stat-bar-track"><div class="stat-bar-fill" [style.width]="barWidths()['vaults'] || '0%'" style="background:linear-gradient(90deg,#06b6d4,#67e8f9)"></div></div>
+      <svg class="stat-spark" viewBox="0 0 80 36" preserveAspectRatio="none"><polyline points="0,28 12,30 24,22 36,24 48,16 60,18 72,10 80,6" fill="none" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-glow" style="background:#ec4899"></div>
+      <div class="stat-top">
+        <div class="stat-icon-box" style="background:rgba(236,72,153,0.14)">📡</div>
+        <div class="stat-chip chip-up">↑ {{stats()?.uptimeTrend || '0%'}}</div>
+      </div>
+      <div class="stat-num" style="background:linear-gradient(135deg,#f9a8d4,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
+        {{stats()?.uptimeScore || 0}}<span style="font-size:14px;font-weight:500">%</span>
+      </div>
+      <div class="stat-lbl">Uptime Score</div>
+      <div class="stat-bar-track"><div class="stat-bar-fill" [style.width]="barWidths()['uptime'] || '0%'" style="background:linear-gradient(90deg,#ec4899,#f9a8d4)"></div></div>
+      <svg class="stat-spark" viewBox="0 0 80 36" preserveAspectRatio="none"><polyline points="0,8 12,10 24,7 36,9 48,6 60,8 72,5 80,4" fill="none" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+
+  <!-- NEW 70/30 GRID -->
+  <div class="command-grid-layout">
+    <!-- LEFT: ACTIVITY SUMMARY (70%) -->
+    <div class="stream-section">
+      <div class="panel-box audit-panel">
+        <div class="panel-header" style="border:none; margin-bottom: 20px;">
+          <div class="ph-left">
+            <div class="ph-icon">📋</div>
+            <div class="ph-title">Intelligence Activity Summary</div>
+            <div class="status-pill-stream">● system live</div>
+          </div>
+          <div class="ph-right">
+            <div class="search-wrap">
+              <input type="text" placeholder="Search activity..." class="audit-search" style="width: 180px;">
+            </div>
+          </div>
+        </div>
+
+        <div class="audit-table-wrap">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th>ACTION</th>
+                <th>ENTITY</th>
+                <th>DETAILS</th>
+                <th>TIME</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (activity of activities().slice(0, 10); track activity.id) {
+                <tr>
+                  <td>
+                    <span class="type-pill" 
+                          [class.ac-create]="activity.type.includes('CREATED') || activity.type.includes('UPLOADED')"
+                          [class.ac-update]="activity.type.includes('UPDATED')"
+                          [class.ac-delete]="activity.type.includes('DELETED')">
+                      {{activity.type.split('_')[1] || activity.type}}
+                    </span>
+                  </td>
+                  <td class="td-entity">
+                    <div class="entity-box">
+                      <span class="material-symbols-rounded" style="font-size: 14px;">
+                        @if (activity.type.includes('PROJECT')) { inventory_2 }
+                        @else if (activity.type.includes('SKILL')) { psychology }
+                        @else { storage }
+                      </span>
+                      {{activity.type.split('_')[0]}}
+                    </div>
+                  </td>
+                  <td class="td-desc">{{activity.description}}</td>
+                  <td class="td-time">{{formatTime(activity.createdAt)}}</td>
+                </tr>
+              }
+              @if (activities().length === 0) {
+                <tr><td colspan="4" style="text-align:center; padding: 40px; color: var(--txt4);">No neural activity detected in database.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: ANALYTICS SIDEBAR (30%) -->
+    <div class="analytics-sidebar">
+      <div class="panel-box quality-panel sidebar-panel">
+        <div class="ph-title" style="margin-bottom: 12px; font-size: 13px;">Platform Quality Index</div>
+        <div class="chart-container" style="height: 160px; gap: 8px;">
+          <div class="bars-wrap">
+            @for (item of chartData(); track item.day) {
+              <div class="bar-group" style="width: 20px;">
+                <div class="bar-stack" style="height: 120px;">
+                  <div class="bar bar-flagged" [style.height.%]="item.flagged"></div>
+                  <div class="bar bar-review" [style.height.%]="item.review"></div>
+                  <div class="bar bar-grounded" [style.height.%]="item.grounded"></div>
+                </div>
+                <div class="bar-label" style="font-size: 8px;">{{item.day[0]}}</div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-box skills-index-panel sidebar-panel">
+        <div class="ph-title" style="margin-bottom: 16px; font-size: 13px;">Recent Skills Recalibration</div>
+        <div class="skills-list">
+          @for (skill of recentSkills(); track skill.id) {
+            <div class="skill-index-item" style="gap: 8px;">
+              <div class="sii-icon-box" style="width: 28px; height: 28px; min-width: 28px;">
+                <span class="material-symbols-rounded" style="font-size: 14px;">{{skill.icon}}</span>
+              </div>
+              <div class="sii-main">
+                <div class="sii-name" style="font-size: 11px;">{{skill.name}}</div>
+                <div class="sii-bar-track" style="margin-top: 4px;">
+                  <div class="sii-bar-fill" [style.width.%]="skill.score" [style.background]="getQualityColor(skill.score)"></div>
+                </div>
+              </div>
+              <div class="sii-score" style="font-size: 12px;">{{skill.score}}</div>
+            </div>
+          }
+          @if (recentSkills().length === 0) {
+            <div style="font-size: 10px; color: var(--txt4); text-align: center; padding: 10px;">No skills forged yet.</div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

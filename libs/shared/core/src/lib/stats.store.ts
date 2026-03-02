@@ -31,19 +31,22 @@ export const StatsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withMethods((store, http = inject(HttpClient)) => ({
-    loadStats: rxMethod<void>(
+    loadStats: rxMethod<{ range?: string } | void>(
       pipe(
         tap(() => patchState(store, { isLoading: true })),
-        switchMap(() =>
-          http.get<PlatformStats>('/api/v1/stats').pipe(
+        switchMap((arg) => {
+          const range = arg && typeof arg === 'object' ? arg.range : undefined;
+          const url = range ? `/api/v1/stats?range=${range}` : '/api/v1/stats';
+          return http.get<PlatformStats>(url).pipe(
             tap((stats) => patchState(store, { stats, isLoading: false })),
             catchError((err) => {
               patchState(store, { isLoading: false, error: err.message });
               return of(null);
             })
-          )
-        )
+          );
+        })
       )
-    )
+    ),
+
   }))
 );

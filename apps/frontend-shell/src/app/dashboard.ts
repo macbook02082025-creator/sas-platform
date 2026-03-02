@@ -4,7 +4,7 @@ import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { filter, map, startWith } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { AuthStore, ThemeStore, ProjectsStore, Theme } from '@sas-platform/shared-core';
+import { AuthStore, ThemeStore, ProjectsStore, Theme, ConfirmStore } from '@sas-platform/shared-core';
 import { DashboardService } from './dashboard.service';
 
 @Component({
@@ -20,6 +20,7 @@ export default class DashboardComponent implements AfterViewInit {
   readonly authStore = inject(AuthStore);
   readonly themeStore = inject(ThemeStore);
   readonly projectsStore = inject(ProjectsStore);
+  readonly confirmStore = inject(ConfirmStore);
   readonly dashboardService = inject(DashboardService);
   private router = inject(Router);
   
@@ -55,6 +56,7 @@ export default class DashboardComponent implements AfterViewInit {
   readonly projects = computed(() => this.projectsStore.projects());
   
   readonly navItems = [
+    { label: 'Dashboard', icon: 'dashboard', route: '/dashboard/stats' },
     { label: 'Intelligence', icon: 'auto_awesome', route: '/dashboard/overview' },
     { label: 'Skills Lab', icon: 'terminal', route: '/dashboard/skills' },
     { label: 'Data Vault', icon: 'database', route: '/dashboard/knowledge' },
@@ -72,12 +74,13 @@ export default class DashboardComponent implements AfterViewInit {
 
   private getCurrentPageTitle(): string {
     const url = this.router.url;
-    if (url.includes('overview')) return 'OVERVIEW';
+    if (url.includes('stats')) return 'DASHBOARD';
+    if (url.includes('overview')) return 'INTELLIGENCE';
     if (url.includes('skills')) return 'SKILLS LAB';
     if (url.includes('knowledge')) return 'DATA VAULT';
     if (url.includes('logs')) return 'OBSERVATORY';
     if (url.includes('settings')) return 'PROTOCOLS';
-    return 'OVERVIEW';
+    return 'DASHBOARD';
   }
 
   onMouseMove(event: MouseEvent) {
@@ -101,8 +104,15 @@ export default class DashboardComponent implements AfterViewInit {
     }
   }
 
-  deleteProject(id: string) {
-    if (confirm('Are you sure you want to decommission this intelligence unit? This action cannot be reversed.')) {
+  async deleteProject(id: string) {
+    const confirmed = await this.confirmStore.ask({
+      title: 'Decommission Unit',
+      message: 'Are you sure you want to decommission this intelligence unit? This action cannot be reversed.',
+      confirmLabel: 'Decommission',
+      danger: true
+    });
+
+    if (confirmed) {
       this.projectsStore.deleteProject(id);
     }
   }

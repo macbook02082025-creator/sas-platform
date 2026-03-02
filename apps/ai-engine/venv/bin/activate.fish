@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/Users/naveensingh/Desktop/SAS/sas-platform/apps/ai-engine/venv"
+set -gx VIRTUAL_ENV "/Users/naveensingh/SASS/sas-platform/apps/ai-engine/venv"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

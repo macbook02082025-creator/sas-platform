@@ -63,17 +63,34 @@ export class ProjectsService {
   }
 
   async update(tenantId: string, id: string, data: { name?: string; description?: string }) {
-    await this.findOne(tenantId, id);
-    return this.prisma.project.update({
+    const project = await this.findOne(tenantId, id);
+    const updated = await this.prisma.project.update({
       where: { id },
       data,
     });
+
+    await this.activityService.logActivity({
+      type: 'PROJECT_UPDATED',
+      description: `Configuration for Unit "${updated.name}" was modified.`,
+      organizationId: tenantId,
+      projectId: id,
+    });
+
+    return updated;
   }
 
   async delete(tenantId: string, id: string) {
-    await this.findOne(tenantId, id);
-    return this.prisma.project.delete({
+    const project = await this.findOne(tenantId, id);
+    const deleted = await this.prisma.project.delete({
       where: { id },
     });
+
+    await this.activityService.logActivity({
+      type: 'PROJECT_DELETED',
+      description: `Unit "${project.name}" was decommissioned and neural links severed.`,
+      organizationId: tenantId,
+    });
+
+    return deleted;
   }
 }

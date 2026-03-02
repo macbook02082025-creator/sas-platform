@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/Users/naveensingh/Desktop/SAS/sas-platform/apps/ai-engine/venv"
+VIRTUAL_ENV="/Users/naveensingh/SASS/sas-platform/apps/ai-engine/venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

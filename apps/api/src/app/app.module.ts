@@ -13,13 +13,13 @@ import { PrismaModule } from './prisma.module';
 @Module({
   imports: [
     PrismaModule,
+    KnowledgeModule,
     AuthModule,
     ProjectsModule,
     SkillsModule,
     ActivityModule,
     StatsModule,
     ChatModule,
-    KnowledgeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

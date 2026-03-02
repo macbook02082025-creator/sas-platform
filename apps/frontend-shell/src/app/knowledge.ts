@@ -1,7 +1,8 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { finalize } from 'rxjs';
+import { ConfirmStore } from '@sas-platform/shared-core';
 
 interface DocumentSource {
   id: string;
@@ -19,16 +20,64 @@ interface DocumentSource {
   templateUrl: './knowledge.html',
   styleUrls: ['./dashboard.scss', './knowledge.scss'],
 })
-export class KnowledgeBaseComponent {
+export class KnowledgeBaseComponent implements OnInit {
   private http = inject(HttpClient);
+  readonly confirmStore = inject(ConfirmStore);
   
+  readonly layout = signal<'grid' | 'list' | 'details'>('grid');
   isDragging = signal(false);
   isUploading = signal(false);
   
-  documents = signal<DocumentSource[]>([
-    { id: '1', name: 'Product_Documentation_V2.pdf', size: '2.4 MB', status: 'indexed', type: 'pdf', updatedAt: new Date('2026-03-01T10:00:00').toISOString() },
-    { id: '2', name: 'Customer_Support_FAQ.md', size: '45 KB', status: 'indexed', type: 'markdown', updatedAt: new Date('2026-02-28T15:30:00').toISOString() }
-  ]);
+  // Menu state
+  readonly activeMenuId = signal<string | null>(null);
+  
+  documents = signal<DocumentSource[]>([]);
+
+  ngOnInit() {
+    this.fetchDocuments();
+    
+    // Global click listener to close menus
+    window.addEventListener('click', () => this.activeMenuId.set(null));
+  }
+
+  toggleMenu(event: Event, id: string) {
+    event.stopPropagation();
+    this.activeMenuId.set(this.activeMenuId() === id ? null : id);
+  }
+
+  fetchDocuments() {
+    this.http.get<DocumentSource[]>('/api/v1/knowledge/all')
+      .subscribe({
+        next: (docs) => this.documents.set(docs),
+        error: (err) => console.error('Failed to fetch documents', err)
+      });
+  }
+
+  async deleteDocument(id: string | Event, docId?: string) {
+    // Handle both direct call from details view and menu call
+    let targetId: string;
+    if (typeof id === 'string') {
+      targetId = id;
+    } else {
+      id.stopPropagation();
+      targetId = docId!;
+    }
+
+    const confirmed = await this.confirmStore.ask({
+      title: 'Delete Source',
+      message: 'Are you sure you want to purge this data source from the vault? This action cannot be undone.',
+      confirmLabel: 'Purge Source',
+      danger: true
+    });
+
+    if (confirmed) {
+      this.http.post(`/api/v1/knowledge/${targetId}/delete`, {}).subscribe({
+        next: () => this.fetchDocuments(),
+        error: (err) => console.error('Failed to delete document', err)
+      });
+    }
+    this.activeMenuId.set(null);
+  }
 
   onFileSelected(event: any) {
     const files = event.target.files;
@@ -81,9 +130,7 @@ export class KnowledgeBaseComponent {
       .pipe(finalize(() => this.isUploading.set(false)))
       .subscribe({
         next: (res: any) => {
-          this.documents.update(docs => 
-            docs.map(d => d.id === newDoc.id ? { ...d, status: 'indexed' } : d)
-          );
+          this.fetchDocuments(); // Refresh from DB
         },
         error: (err) => {
           this.documents.update(docs => 

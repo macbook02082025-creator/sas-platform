@@ -29,18 +29,20 @@ export const ActivityStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withMethods((store, http = inject(HttpClient)) => ({
-    loadActivities: rxMethod<void>(
+    loadActivities: rxMethod<{ range?: string } | void>(
       pipe(
         tap(() => patchState(store, { isLoading: true })),
-        switchMap(() =>
-          http.get<Activity[]>('/api/v1/activity').pipe(
+        switchMap((arg) => {
+          const range = arg && typeof arg === 'object' ? arg.range : undefined;
+          const url = range ? `/api/v1/activity?range=${range}` : '/api/v1/activity';
+          return http.get<Activity[]>(url).pipe(
             tap((activities) => patchState(store, { activities, isLoading: false })),
             catchError((err) => {
               patchState(store, { isLoading: false, error: err.message });
               return of([]);
             })
-          )
-        )
+          );
+        })
       )
     )
   }))

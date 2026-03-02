@@ -20,12 +20,16 @@ export const appRoutes: Route[] = [
     children: [
       {
         path: '',
-        redirectTo: 'overview',
+        redirectTo: 'stats',
         pathMatch: 'full'
       },
       {
         path: 'overview',
         loadComponent: () => import('./overview'),
+      },
+      {
+        path: 'stats',
+        loadComponent: () => import('./stats-dashboard'),
       },
       {
         path: 'skills',

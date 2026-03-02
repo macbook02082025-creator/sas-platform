@@ -18,7 +18,7 @@ const initialState: AuthState = {
   currentOrganizationId: localStorage.getItem('tenant_id'),
   isLoading: false,
   error: null,
-  isAuthenticated: false,
+  isAuthenticated: !!localStorage.getItem('token'),
 };
 
 export const AuthStore = signalStore(
@@ -124,12 +124,14 @@ export const AuthStore = signalStore(
           },
           error: (err) => {
             authService.logout();
+            localStorage.removeItem('tenant_id');
             patchState(store, {
               user: null,
               currentOrganizationId: null,
               isAuthenticated: false,
               isLoading: false
             });
+            router.navigate(['/auth/login']);
           }
         });
       }

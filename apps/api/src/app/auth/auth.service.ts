@@ -49,7 +49,11 @@ export class AuthService {
       },
     });
 
-    const payload = { sub: user.id, email: user.email };
+    const session = await this.prisma.session.create({
+      data: { userId: user.id }
+    });
+
+    const payload = { sub: user.id, email: user.email, sid: session.id };
     return {
       access_token: await this.jwtService.signAsync(payload),
       user: {
@@ -57,12 +61,13 @@ export class AuthService {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        sid: session.id,
         organizations: user.memberships.map((m) => m.organization),
       },
     };
   }
 
-  async getMe(userId: string) {
+  async getMe(userId: string, sid?: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -81,6 +86,7 @@ export class AuthService {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
+      sid: sid,
       organizations: user.memberships.map((m) => m.organization),
     };
   }
@@ -101,7 +107,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { sub: user.id, email: user.email };
+    const session = await this.prisma.session.create({
+      data: { userId: user.id }
+    });
+
+    const payload = { sub: user.id, email: user.email, sid: session.id };
     return {
       access_token: await this.jwtService.signAsync(payload),
       user: {
@@ -109,6 +119,7 @@ export class AuthService {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        sid: session.id,
         organizations: user.memberships.map((m) => m.organization),
       },
     };
